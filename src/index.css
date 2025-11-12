@@ -1,16 +1,20 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-@layer base {
-  body {
-    @apply bg-gradient-to-br from-dark-900 via-dark-800 to-dark-700 text-white min-h-screen;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  }
+@theme {
+  --color-primary: #22e584;
+  --color-dark-900: #0f1c2e;
+  --color-dark-800: #162447;
+  --color-dark-700: #121212;
+  --color-dark-600: rgba(28, 34, 47, 0.85);
 }
 
-@layer utilities {
-  .text-secondary {
-    color: rgba(255, 255, 255, 0.7);
-  }
+body {
+  background: linear-gradient(to bottom right, var(--color-dark-900), var(--color-dark-800), var(--color-dark-700));
+  color: white;
+  min-height: 100vh;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+.text-secondary {
+  color: rgba(255, 255, 255, 0.7);
 }
