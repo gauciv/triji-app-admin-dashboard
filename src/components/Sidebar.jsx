@@ -15,8 +15,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
     <>
       {/* Mobile overlay */}
       {sidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black/50 z-40 md:hidden"
+                <div
+          className="md:hidden fixed inset-0 bg-black/50 z-40 cursor-pointer"
           onClick={() => setSidebarOpen(false)}
         />
       )}
@@ -39,9 +39,9 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
               </div>
               <span className="font-bold text-lg">Triji Admin</span>
             </div>
-            <button
+                        <button
               onClick={() => setSidebarOpen(false)}
-              className="md:hidden text-white hover:text-primary transition-colors"
+              className="md:hidden text-secondary hover:text-white cursor-pointer"
             >
               <X size={24} />
             </button>

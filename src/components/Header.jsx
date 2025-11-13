@@ -30,7 +30,7 @@ const Header = ({ setSidebarOpen }) => {
       <div className="flex items-center justify-between">
         <button
           onClick={() => setSidebarOpen(true)}
-          className="md:hidden text-white hover:text-primary transition-colors"
+          className="md:hidden text-white hover:text-primary transition-colors cursor-pointer"
         >
           <Menu size={24} />
         </button>
@@ -44,7 +44,7 @@ const Header = ({ setSidebarOpen }) => {
           <button
             onClick={handleLogout}
             disabled={isLoggingOut}
-            className="flex items-center gap-2 px-4 py-2 bg-dark-700 hover:bg-dark-800 rounded-lg transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 px-4 py-2 bg-dark-700 hover:bg-dark-800 rounded-lg transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
             {isLoggingOut ? (
               <>

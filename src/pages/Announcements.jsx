@@ -202,7 +202,7 @@ const Announcements = () => {
         <h1 className="text-3xl font-bold">Announcements Management</h1>
         <button
           onClick={() => setShowModal(true)}
-          className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-dark-900 font-medium px-4 py-2 rounded-lg transition-colors"
+          className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-dark-900 font-medium px-4 py-2 rounded-lg transition-colors cursor-pointer"
         >
           <Plus size={20} />
           <span>New Announcement</span>
@@ -275,14 +275,14 @@ const Announcements = () => {
                 <div className="flex gap-1.5">
                   <button
                     onClick={() => handleEdit(announcement)}
-                    className="p-1.5 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-md transition-colors"
+                    className="p-1.5 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-md transition-colors cursor-pointer"
                     title="Edit"
                   >
                     <Edit size={16} />
                   </button>
                   <button
                     onClick={() => handleDelete(announcement)}
-                    className="p-1.5 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-md transition-colors"
+                    className="p-1.5 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-md transition-colors cursor-pointer"
                     title="Delete"
                   >
                     <Trash2 size={16} />
@@ -300,7 +300,7 @@ const Announcements = () => {
           <div className="bg-dark-600 border border-primary/20 rounded-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold">{editingAnnouncement ? 'Edit Announcement' : 'New Announcement'}</h2>
-              <button onClick={resetForm} className="text-secondary hover:text-white">
+              <button onClick={resetForm} className="text-secondary hover:text-white cursor-pointer">
                 <X size={24} />
               </button>
             </div>
@@ -356,14 +356,14 @@ const Announcements = () => {
               <div className="flex gap-3 pt-4">
                 <button
                   type="submit"
-                  className="flex-1 bg-primary hover:bg-primary/90 text-dark-900 font-medium py-2 rounded-lg transition-colors"
+                  className="flex-1 bg-primary hover:bg-primary/90 text-dark-900 font-medium py-2 rounded-lg transition-colors cursor-pointer"
                 >
                   {editingAnnouncement ? 'Update Announcement' : 'Create Announcement'}
                 </button>
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="flex-1 bg-dark-700 hover:bg-dark-800 text-white py-2 rounded-lg transition-colors"
+                  className="flex-1 bg-dark-700 hover:bg-dark-800 text-white py-2 rounded-lg transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>

@@ -146,7 +146,7 @@ const Dashboard = () => {
         {statCards.map((stat) => (
           <div
             key={stat.title}
-            className="bg-dark-600 border border-primary/20 rounded-lg p-3 hover:border-primary/30 transition-all duration-200"
+            className="bg-dark-600 border border-primary/20 rounded-lg p-3 hover:border-primary/30 transition-all duration-200 cursor-pointer"
           >
             <div className="flex items-center gap-2 mb-2">
               <div className={`${stat.bgColor} ${stat.color} p-1.5 rounded-lg`}>
@@ -169,7 +169,7 @@ const Dashboard = () => {
             {recentActivity.map((item) => (
               <div
                 key={item.id}
-                className="flex items-start gap-3 p-3 bg-dark-700 rounded-lg hover:bg-dark-800 transition-colors"
+                className="flex items-start gap-3 p-3 bg-dark-700 rounded-lg hover:bg-dark-800 transition-colors cursor-pointer"
               >
                 <div
                   className={`p-1.5 rounded-lg ${

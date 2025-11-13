@@ -206,7 +206,7 @@ const Reports = () => {
                   {report.status === 'Pending' && (
                     <button
                       onClick={() => updateStatus(report.id, 'Reviewed')}
-                      className="flex items-center gap-2 px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-lg transition-colors text-sm"
+                      className="flex items-center gap-2 px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-lg transition-colors text-sm cursor-pointer"
                     >
                       <Eye size={16} />
                       <span>Mark Reviewed</span>
@@ -215,7 +215,7 @@ const Reports = () => {
                   {report.status === 'Reviewed' && (
                     <button
                       onClick={() => updateStatus(report.id, 'Resolved')}
-                      className="flex items-center gap-2 px-4 py-2 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-lg transition-colors text-sm"
+                      className="flex items-center gap-2 px-4 py-2 bg-green-500/20 hover:bg-green-500/30 text-green-400 rounded-lg transition-colors text-sm cursor-pointer"
                     >
                       <CheckCircle size={16} />
                       <span>Mark Resolved</span>

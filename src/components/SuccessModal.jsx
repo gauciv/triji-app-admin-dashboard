@@ -26,9 +26,9 @@ const SuccessModal = ({
             </div>
             <h2 className="text-xl font-bold text-green-400">{title}</h2>
           </div>
-          <button 
+                    <button
             onClick={onClose}
-            className="text-secondary hover:text-white transition-colors"
+            className="absolute top-3 right-3 text-secondary hover:text-white transition-colors cursor-pointer"
           >
             <X size={20} />
           </button>
@@ -39,7 +39,7 @@ const SuccessModal = ({
         <div className="flex justify-end">
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors"
+            className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors cursor-pointer"
           >
             OK
           </button>

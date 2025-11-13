@@ -20,9 +20,9 @@ const ErrorModal = ({
             </div>
             <h2 className="text-xl font-bold text-red-400">{title}</h2>
           </div>
-          <button 
+                    <button
             onClick={onClose}
-            className="text-secondary hover:text-white transition-colors"
+            className="absolute top-3 right-3 text-secondary hover:text-white transition-colors cursor-pointer"
           >
             <X size={20} />
           </button>

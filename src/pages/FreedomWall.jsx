@@ -170,7 +170,7 @@ const FreedomWall = () => {
         </div>
         <button
           onClick={() => setShowModal(true)}
-          className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-dark-900 font-medium px-4 py-2 rounded-lg transition-colors"
+          className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-dark-900 font-medium px-4 py-2 rounded-lg transition-colors cursor-pointer"
         >
           <Plus size={20} />
           <span>New Post</span>
@@ -206,7 +206,7 @@ const FreedomWall = () => {
                 </div>
                 <button
                   onClick={() => handleDelete(post.id)}
-                  className="p-1.5 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-md transition-colors flex-shrink-0"
+                  className="p-1.5 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-md transition-colors flex-shrink-0 cursor-pointer"
                   title="Delete post"
                 >
                   <Trash2 size={14} />
@@ -226,7 +226,7 @@ const FreedomWall = () => {
           <div className="bg-dark-600 border border-primary/20 rounded-lg p-6 w-full max-w-lg">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold">New Post</h2>
-              <button onClick={resetForm} className="text-secondary hover:text-white">
+              <button onClick={resetForm} className="text-secondary hover:text-white cursor-pointer">
                 <X size={24} />
               </button>
             </div>

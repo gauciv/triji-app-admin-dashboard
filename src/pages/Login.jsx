@@ -113,7 +113,7 @@ const Login = () => {
 
             <button
               onClick={handleBackToLogin}
-              className="w-full bg-primary hover:bg-primary/90 text-dark-900 font-medium py-3 rounded-lg transition-colors"
+              className="w-full bg-primary hover:bg-primary/90 text-dark-900 font-medium py-3 rounded-lg transition-colors cursor-pointer"
             >
               Back to Login
             </button>
@@ -177,7 +177,7 @@ const Login = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-primary hover:bg-primary/90 text-dark-900 font-medium py-3 rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-primary hover:bg-primary/90 text-dark-900 font-medium py-3 rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               {loading ? (
                 <>
