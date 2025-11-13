@@ -4,6 +4,9 @@ import { db } from '../lib/firebase';
 import { Trash2, Search, CheckCircle, Eye } from 'lucide-react';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
+import ConfirmModal from '../components/ConfirmModal';
+import ErrorModal from '../components/ErrorModal';
+import SuccessModal from '../components/SuccessModal';
 
 const Reports = () => {
   const [reports, setReports] = useState([]);
@@ -12,6 +15,9 @@ const Reports = () => {
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('All');
+  const [confirmModal, setConfirmModal] = useState({ isOpen: false, action: null });
+  const [errorModal, setErrorModal] = useState({ isOpen: false, title: '', message: '', details: '' });
+  const [successModal, setSuccessModal] = useState({ isOpen: false, message: '' });
 
   useEffect(() => {
     if (!db) {
@@ -68,33 +74,49 @@ const Reports = () => {
   const updateStatus = async (reportId, newStatus) => {
     try {
       await updateDoc(doc(db, 'reports', reportId), {
-        status: newStatus
+        status: newStatus,
+        updatedAt: new Date()
       });
-      toast.success(`Report marked as ${newStatus.toLowerCase()}!`);
+      setSuccessModal({ 
+        isOpen: true, 
+        message: `Report has been marked as ${newStatus.toLowerCase()}!` 
+      });
     } catch (error) {
       console.error('Error updating report status:', error);
-      if (error.code === 'permission-denied') {
-        toast.error('Access denied. Admin privileges required to update reports.');
-      } else {
-        toast.error('Failed to update report status. Please try again.');
-      }
+      setErrorModal({
+        isOpen: true,
+        title: 'Failed to Update Report',
+        message: error.code === 'permission-denied'
+          ? 'You do not have permission to update reports. Admin privileges required.'
+          : 'An error occurred while updating the report status. Please try again.',
+        details: error.message
+      });
     }
   };
 
   const handleDelete = async (reportId) => {
-    if (window.confirm('Are you sure you want to delete this report?')) {
-      try {
-        await deleteDoc(doc(db, 'reports', reportId));
-        toast.success('Report deleted successfully!');
-      } catch (error) {
-        console.error('Error deleting report:', error);
-        if (error.code === 'permission-denied') {
-          toast.error('Access denied. Admin privileges required to delete reports.');
-        } else {
-          toast.error('Failed to delete report. Please try again.');
+    setConfirmModal({
+      isOpen: true,
+      action: async () => {
+        try {
+          await deleteDoc(doc(db, 'reports', reportId));
+          setSuccessModal({ 
+            isOpen: true, 
+            message: 'Report has been deleted successfully!' 
+          });
+        } catch (error) {
+          console.error('Error deleting report:', error);
+          setErrorModal({
+            isOpen: true,
+            title: 'Failed to Delete Report',
+            message: error.code === 'permission-denied'
+              ? 'You do not have permission to delete reports. Admin privileges required.'
+              : 'An error occurred while deleting the report. Please try again.',
+            details: error.message
+          });
         }
       }
-    }
+    });
   };
 
   const getStatusColor = (status) => {
@@ -211,6 +233,33 @@ const Reports = () => {
           ))
         )}
       </div>
+
+      {/* Modals */}
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        onClose={() => setConfirmModal({ isOpen: false, action: null })}
+        onConfirm={confirmModal.action}
+        title="Delete Report"
+        message="Are you sure you want to delete this report? This action cannot be undone."
+        confirmText="Delete"
+        type="danger"
+      />
+
+      <ErrorModal
+        isOpen={errorModal.isOpen}
+        onClose={() => setErrorModal({ isOpen: false, title: '', message: '', details: '' })}
+        title={errorModal.title}
+        message={errorModal.message}
+        details={errorModal.details}
+      />
+
+      <SuccessModal
+        isOpen={successModal.isOpen}
+        onClose={() => setSuccessModal({ isOpen: false, message: '' })}
+        message={successModal.message}
+        autoClose={true}
+        autoCloseDelay={2000}
+      />
     </div>
   );
 };

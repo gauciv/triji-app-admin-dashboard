@@ -253,7 +253,7 @@ const Users = () => {
                           </span>
                         </td>
                         <td className="px-6 py-4 text-secondary">
-                          {user.createdAt ? format(user.createdAt.toDate(), 'MMM dd, yyyy') : 'N/A'}
+                          {user.createdAt ? (typeof user.createdAt.toDate === 'function' ? format(user.createdAt.toDate(), 'MMM dd, yyyy') : format(new Date(user.createdAt), 'MMM dd, yyyy')) : 'N/A'}
                         </td>
                       </tr>
                     );
@@ -283,7 +283,7 @@ const Users = () => {
                             {user.role}
                           </span>
                           <span className="text-xs text-secondary">
-                            {user.createdAt ? format(user.createdAt.toDate(), 'MMM dd, yyyy') : 'N/A'}
+                            {user.createdAt ? (typeof user.createdAt.toDate === 'function' ? format(user.createdAt.toDate(), 'MMM dd, yyyy') : format(new Date(user.createdAt), 'MMM dd, yyyy')) : 'N/A'}
                           </span>
                         </div>
                       </div>

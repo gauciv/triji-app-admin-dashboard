@@ -5,6 +5,9 @@ import { useAuth } from '../contexts/AuthContext';
 import { Plus, Edit, Trash2, Search, X } from 'lucide-react';
 import { format } from 'date-fns';
 import toast from 'react-hot-toast';
+import ConfirmModal from '../components/ConfirmModal';
+import ErrorModal from '../components/ErrorModal';
+import SuccessModal from '../components/SuccessModal';
 
 const Tasks = () => {
   const { currentUser } = useAuth();
@@ -19,6 +22,9 @@ const Tasks = () => {
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const [confirmModal, setConfirmModal] = useState({ isOpen: false, action: null, taskId: null });
+  const [errorModal, setErrorModal] = useState({ isOpen: false, title: '', message: '', details: '' });
+  const [successModal, setSuccessModal] = useState({ isOpen: false, message: '' });
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -150,19 +156,28 @@ const Tasks = () => {
 
       if (editingTask) {
         await updateDoc(doc(db, 'tasks', editingTask.id), taskData);
-        toast.success('Task updated successfully!');
+        setSuccessModal({ 
+          isOpen: true, 
+          message: 'Task has been updated successfully!' 
+        });
       } else {
         await addDoc(collection(db, 'tasks'), taskData);
-        toast.success('Task created successfully!');
+        setSuccessModal({ 
+          isOpen: true, 
+          message: 'New task has been created successfully!' 
+        });
       }
       resetForm();
     } catch (error) {
       console.error('Error saving task:', error);
-      if (error.code === 'permission-denied') {
-        toast.error('Access denied. Admin privileges required to create/edit tasks.');
-      } else {
-        toast.error(error.message || 'Failed to save task. Please try again.');
-      }
+      setErrorModal({
+        isOpen: true,
+        title: 'Failed to Save Task',
+        message: error.code === 'permission-denied' 
+          ? 'You do not have permission to create or edit tasks. Admin privileges required.'
+          : 'An error occurred while saving the task. Please try again.',
+        details: error.message
+      });
     } finally {
       setUploading(false);
     }
@@ -195,19 +210,29 @@ const Tasks = () => {
   };
 
   const handleDelete = async (taskId) => {
-    if (window.confirm('Are you sure you want to delete this task?')) {
-      try {
-        await deleteDoc(doc(db, 'tasks', taskId));
-        toast.success('Task deleted successfully!');
-      } catch (error) {
-        console.error('Error deleting task:', error);
-        if (error.code === 'permission-denied') {
-          toast.error('Access denied. Admin privileges required to delete tasks.');
-        } else {
-          toast.error('Failed to delete task. Please try again.');
+    setConfirmModal({
+      isOpen: true,
+      action: async () => {
+        try {
+          await deleteDoc(doc(db, 'tasks', taskId));
+          setSuccessModal({ 
+            isOpen: true, 
+            message: 'Task has been deleted successfully!' 
+          });
+        } catch (error) {
+          console.error('Error deleting task:', error);
+          setErrorModal({
+            isOpen: true,
+            title: 'Failed to Delete Task',
+            message: error.code === 'permission-denied'
+              ? 'You do not have permission to delete tasks. Admin privileges required.'
+              : 'An error occurred while deleting the task. Please try again.',
+            details: error.message
+          });
         }
-      }
-    }
+      },
+      taskId
+    });
   };
 
   const resetForm = () => {
@@ -493,6 +518,34 @@ const Tasks = () => {
           </div>
         </div>
       )}
+
+      {/* Modals */}
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        onClose={() => setConfirmModal({ isOpen: false, action: null, taskId: null })}
+        onConfirm={confirmModal.action}
+        title="Delete Task"
+        message="Are you sure you want to delete this task? This action cannot be undone."
+        confirmText="Delete"
+        type="danger"
+      />
+
+      <ErrorModal
+        isOpen={errorModal.isOpen}
+        onClose={() => setErrorModal({ isOpen: false, title: '', message: '', details: '' })}
+        title={errorModal.title}
+        message={errorModal.message}
+        details={errorModal.details}
+        onRetry={null}
+      />
+
+      <SuccessModal
+        isOpen={successModal.isOpen}
+        onClose={() => setSuccessModal({ isOpen: false, message: '' })}
+        message={successModal.message}
+        autoClose={true}
+        autoCloseDelay={2000}
+      />
     </div>
   );
 };

@@ -5,6 +5,9 @@ import { useAuth } from '../contexts/AuthContext';
 import { Plus, Edit, Trash2, X, Filter } from 'lucide-react';
 import { format, isAfter } from 'date-fns';
 import toast from 'react-hot-toast';
+import ConfirmModal from '../components/ConfirmModal';
+import ErrorModal from '../components/ErrorModal';
+import SuccessModal from '../components/SuccessModal';
 
 const Announcements = () => {
   const { currentUser } = useAuth();
@@ -16,6 +19,9 @@ const Announcements = () => {
   const [editingAnnouncement, setEditingAnnouncement] = useState(null);
   const [filterType, setFilterType] = useState('All');
   const [filterExpiry, setFilterExpiry] = useState('All');
+  const [confirmModal, setConfirmModal] = useState({ isOpen: false, action: null });
+  const [errorModal, setErrorModal] = useState({ isOpen: false, title: '', message: '', details: '' });
+  const [successModal, setSuccessModal] = useState({ isOpen: false, message: '' });
   const [formData, setFormData] = useState({
     title: '',
     content: '',
@@ -94,19 +100,28 @@ const Announcements = () => {
     try {
       if (editingAnnouncement) {
         await updateDoc(doc(db, 'announcements', editingAnnouncement.id), announcementData);
-        toast.success('Announcement updated successfully!');
+        setSuccessModal({ 
+          isOpen: true, 
+          message: 'Announcement has been updated successfully!' 
+        });
       } else {
         await addDoc(collection(db, 'announcements'), announcementData);
-        toast.success('Announcement created successfully!');
+        setSuccessModal({ 
+          isOpen: true, 
+          message: 'New announcement has been published successfully!' 
+        });
       }
       resetForm();
     } catch (error) {
       console.error('Error saving announcement:', error);
-      if (error.code === 'permission-denied') {
-        toast.error('Access denied. You do not have permission to create/edit announcements.');
-      } else {
-        toast.error('Failed to save announcement. Please try again.');
-      }
+      setErrorModal({
+        isOpen: true,
+        title: 'Failed to Save Announcement',
+        message: error.code === 'permission-denied'
+          ? 'You do not have permission to create or edit announcements.'
+          : 'An error occurred while saving the announcement. Please try again.',
+        details: error.message
+      });
     }
   };
 
@@ -122,21 +137,29 @@ const Announcements = () => {
   };
 
   const handleDelete = async (announcement) => {
-    // Only allow deletion of own announcements (as per requirements)
-    if (announcement.authorId !== currentUser.uid) {
-      toast.error('You can only delete your own announcements');
-      return;
-    }
-
-    if (window.confirm('Are you sure you want to delete this announcement?')) {
-      try {
-        await deleteDoc(doc(db, 'announcements', announcement.id));
-        toast.success('Announcement deleted successfully!');
-      } catch (error) {
-        console.error('Error deleting announcement:', error);
-        toast.error('Failed to delete announcement. Please try again.');
+    // Check permission based on Firebase rules
+    setConfirmModal({
+      isOpen: true,
+      action: async () => {
+        try {
+          await deleteDoc(doc(db, 'announcements', announcement.id));
+          setSuccessModal({ 
+            isOpen: true, 
+            message: 'Announcement has been deleted successfully!' 
+          });
+        } catch (error) {
+          console.error('Error deleting announcement:', error);
+          setErrorModal({
+            isOpen: true,
+            title: 'Failed to Delete Announcement',
+            message: error.code === 'permission-denied'
+              ? 'You can only delete your own announcements or you need admin privileges.'
+              : 'An error occurred while deleting the announcement. Please try again.',
+            details: error.message
+          });
+        }
       }
-    }
+    });
   };
 
   const resetForm = () => {
@@ -349,6 +372,33 @@ const Announcements = () => {
           </div>
         </div>
       )}
+
+      {/* Modals */}
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        onClose={() => setConfirmModal({ isOpen: false, action: null })}
+        onConfirm={confirmModal.action}
+        title="Delete Announcement"
+        message="Are you sure you want to delete this announcement? This action cannot be undone."
+        confirmText="Delete"
+        type="danger"
+      />
+
+      <ErrorModal
+        isOpen={errorModal.isOpen}
+        onClose={() => setErrorModal({ isOpen: false, title: '', message: '', details: '' })}
+        title={errorModal.title}
+        message={errorModal.message}
+        details={errorModal.details}
+      />
+
+      <SuccessModal
+        isOpen={successModal.isOpen}
+        onClose={() => setSuccessModal({ isOpen: false, message: '' })}
+        message={successModal.message}
+        autoClose={true}
+        autoCloseDelay={2000}
+      />
     </div>
   );
 };
