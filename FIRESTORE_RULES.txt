@@ -20,6 +20,9 @@ service cloud.firestore {
       
       // Admins can read all users
       allow read: if isAdmin();
+      
+      // Admins can update any user (for role assignment)
+      allow update: if isAdmin();
     }
 
     // Rule for 'tasks' collection

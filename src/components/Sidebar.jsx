@@ -34,8 +34,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
           {/* Logo/Brand */}
           <div className="flex items-center justify-between px-6 py-4 border-b border-primary/20">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center font-bold text-dark-900">
-                T
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center">
+                <img src="/icon.png" alt="Triji Logo" className="w-full h-full object-contain" />
               </div>
               <span className="font-bold text-lg">Triji Admin</span>
             </div>
