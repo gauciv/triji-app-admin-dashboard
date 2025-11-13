@@ -29,8 +29,7 @@ const Tasks = () => {
     title: '',
     description: '',
     subject: '',
-    deadline: '',
-    status: 'Pending'
+    deadline: ''
   });
 
   // Fetch tasks with error handling
@@ -123,32 +122,12 @@ const Tasks = () => {
     setUploading(true);
     
     try {
-      let imageUrl = editingTask?.imageUrl || null;
-
-      // Handle image upload if there's a new image
-      if (imageFile) {
-        try {
-          // Note: Firebase Storage not configured, image upload will be skipped
-          // In production, uncomment and configure storage:
-          // const storage = getStorage();
-          // const storageRef = ref(storage, `tasks/${Date.now()}_${imageFile.name}`);
-          // await uploadBytes(storageRef, imageFile);
-          // imageUrl = await getDownloadURL(storageRef);
-          
-          toast.error('Image upload not configured. Task will be saved without image.');
-        } catch (uploadError) {
-          console.error('Image upload error:', uploadError);
-          toast.error('Failed to upload image. Task will be saved without image.');
-        }
-      }
-
       const taskData = {
         title: formData.title.trim(),
         description: formData.description.trim(),
         subject: formData.subject.trim(),
         deadline: Timestamp.fromDate(new Date(formData.deadline)),
-        status: formData.status,
-        imageUrl,
+        status: 'Pending',
         createdBy: currentUser.uid,
         createdAt: editingTask?.createdAt || Timestamp.now(),
         updatedAt: Timestamp.now()
@@ -202,10 +181,8 @@ const Tasks = () => {
       title: task.title || '',
       description: task.description || '',
       subject: task.subject || '',
-      deadline: deadlineValue,
-      status: task.status || 'Pending'
+      deadline: deadlineValue
     });
-    setImagePreview(task.imageUrl || null);
     setShowModal(true);
   };
 
@@ -240,8 +217,7 @@ const Tasks = () => {
       title: '',
       description: '',
       subject: '',
-      deadline: '',
-      status: 'Pending'
+      deadline: ''
     });
     setEditingTask(null);
     setShowModal(false);
@@ -445,36 +421,6 @@ const Tasks = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">Image (optional)</label>
-                {imagePreview && (
-                  <div className="mb-3 relative">
-                    <img 
-                      src={imagePreview} 
-                      alt="Preview" 
-                      className="w-full max-h-48 object-cover rounded-lg"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setImageFile(null);
-                        setImagePreview(null);
-                      }}
-                      className="absolute top-2 right-2 p-1 bg-red-500/80 hover:bg-red-500 rounded-full text-white"
-                    >
-                      <X size={16} />
-                    </button>
-                  </div>
-                )}
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                  className="w-full px-4 py-2 bg-dark-700 border border-dark-800 rounded-lg focus:outline-none focus:border-primary file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-dark-900 hover:file:bg-primary/90"
-                />
-                <p className="text-xs text-secondary mt-1">Maximum file size: 5MB</p>
-              </div>
-
-              <div>
                 <label className="block text-sm font-medium mb-2">Deadline *</label>
                 <input
                   type="date"
@@ -483,20 +429,6 @@ const Tasks = () => {
                   onChange={(e) => setFormData({...formData, deadline: e.target.value})}
                   className="w-full px-4 py-2 bg-dark-700 border border-dark-800 rounded-lg focus:outline-none focus:border-primary"
                 />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">Status *</label>
-                <select
-                  required
-                  value={formData.status}
-                  onChange={(e) => setFormData({...formData, status: e.target.value})}
-                  className="w-full px-4 py-2 bg-dark-700 border border-dark-800 rounded-lg focus:outline-none focus:border-primary"
-                >
-                  <option value="Pending">Pending</option>
-                  <option value="In Progress">In Progress</option>
-                  <option value="Completed">Completed</option>
-                </select>
               </div>
 
               <div className="flex gap-3 pt-4">
