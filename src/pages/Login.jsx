@@ -128,8 +128,8 @@ const Login = () => {
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-primary rounded-2xl mb-4">
-            <span className="text-3xl font-bold text-dark-900">T</span>
+          <div className="inline-flex items-center justify-center w-20 h-20 mb-4">
+            <img src="/icon.png" alt="Triji Logo" className="w-full h-full object-contain" />
           </div>
           <h1 className="text-3xl font-bold mb-2">Triji Admin</h1>
           <p className="text-secondary">Sign in to manage your dashboard</p>
