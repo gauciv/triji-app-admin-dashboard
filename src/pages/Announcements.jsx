@@ -282,9 +282,8 @@ const Announcements = () => {
                   </button>
                   <button
                     onClick={() => handleDelete(announcement)}
-                    className="p-1.5 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    disabled={announcement.authorId !== currentUser.uid}
-                    title={announcement.authorId !== currentUser.uid ? 'Can only delete your own announcements' : 'Delete'}
+                    className="p-1.5 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-md transition-colors"
+                    title="Delete"
                   >
                     <Trash2 size={16} />
                   </button>
