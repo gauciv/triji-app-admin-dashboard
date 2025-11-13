@@ -3,6 +3,7 @@ import { collection, query, onSnapshot, updateDoc, deleteDoc, doc, orderBy, wher
 import { db } from '../lib/firebase';
 import { Trash2, Search, CheckCircle, Eye } from 'lucide-react';
 import { format } from 'date-fns';
+import toast from 'react-hot-toast';
 
 const Reports = () => {
   const [reports, setReports] = useState([]);
@@ -49,9 +50,10 @@ const Reports = () => {
       await updateDoc(doc(db, 'reports', reportId), {
         status: newStatus
       });
+      toast.success(`Report marked as ${newStatus.toLowerCase()}!`);
     } catch (error) {
       console.error('Error updating report status:', error);
-      alert('Failed to update report status');
+      toast.error('Failed to update report status. Please try again.');
     }
   };
 
@@ -59,9 +61,10 @@ const Reports = () => {
     if (window.confirm('Are you sure you want to delete this report?')) {
       try {
         await deleteDoc(doc(db, 'reports', reportId));
+        toast.success('Report deleted successfully!');
       } catch (error) {
         console.error('Error deleting report:', error);
-        alert('Failed to delete report');
+        toast.error('Failed to delete report. Please try again.');
       }
     }
   };

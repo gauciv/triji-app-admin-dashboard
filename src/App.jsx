@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
@@ -8,12 +9,34 @@ import Tasks from './pages/Tasks';
 import Announcements from './pages/Announcements';
 import Reports from './pages/Reports';
 import Users from './pages/Users';
-import Subjects from './pages/Subjects';
 
 function App() {
   return (
     <Router>
       <AuthProvider>
+        <Toaster 
+          position="top-right"
+          toastOptions={{
+            duration: 3000,
+            style: {
+              background: '#1c222f',
+              color: '#fff',
+              border: '1px solid rgba(34, 229, 132, 0.2)',
+            },
+            success: {
+              iconTheme: {
+                primary: '#22e584',
+                secondary: '#1c222f',
+              },
+            },
+            error: {
+              iconTheme: {
+                primary: '#ef4444',
+                secondary: '#1c222f',
+              },
+            },
+          }}
+        />
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route
@@ -29,7 +52,6 @@ function App() {
             <Route path="announcements" element={<Announcements />} />
             <Route path="reports" element={<Reports />} />
             <Route path="users" element={<Users />} />
-            <Route path="subjects" element={<Subjects />} />
           </Route>
         </Routes>
       </AuthProvider>

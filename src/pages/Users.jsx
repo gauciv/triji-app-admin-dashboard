@@ -18,27 +18,49 @@ const Users = () => {
   });
 
   useEffect(() => {
-    const usersQuery = query(collection(db, 'users'), orderBy('createdAt', 'desc'));
-    const unsubscribe = onSnapshot(usersQuery, (snapshot) => {
-      const usersData = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-      setUsers(usersData);
-      setFilteredUsers(usersData);
-
-      // Calculate stats
-      const newStats = {
-        students: usersData.filter(u => u.role === 'student').length,
-        officers: usersData.filter(u => u.role === 'officer').length,
-        admins: usersData.filter(u => u.role === 'admin').length,
-        total: usersData.length
-      };
-      setStats(newStats);
+    // Check if Firebase is initialized
+    if (!db) {
+      console.error('Firebase db is not initialized');
       setLoading(false);
-    });
+      return;
+    }
 
-    return () => unsubscribe();
+    let unsubscribe;
+    try {
+      const usersQuery = query(collection(db, 'users'), orderBy('createdAt', 'desc'));
+      unsubscribe = onSnapshot(
+        usersQuery, 
+        (snapshot) => {
+          const usersData = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          }));
+          setUsers(usersData);
+          setFilteredUsers(usersData);
+
+          // Calculate stats
+          const newStats = {
+            students: usersData.filter(u => u.role === 'student').length,
+            officers: usersData.filter(u => u.role === 'officer').length,
+            admins: usersData.filter(u => u.role === 'admin').length,
+            total: usersData.length
+          };
+          setStats(newStats);
+          setLoading(false);
+        },
+        (error) => {
+          console.error('Error fetching users:', error);
+          setLoading(false);
+        }
+      );
+    } catch (error) {
+      console.error('Error setting up users listener:', error);
+      setLoading(false);
+    }
+
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
   }, []);
 
   // Filter users

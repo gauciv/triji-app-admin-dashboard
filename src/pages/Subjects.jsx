@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { collection, query, onSnapshot, addDoc, updateDoc, deleteDoc, doc, where, getDocs, Timestamp } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { Plus, Edit, Trash2, BookOpen, X } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const Subjects = () => {
   const [subjects, setSubjects] = useState([]);
@@ -41,13 +42,15 @@ const Subjects = () => {
     try {
       if (editingSubject) {
         await updateDoc(doc(db, 'subjects', editingSubject.id), subjectData);
+        toast.success('Subject updated successfully!');
       } else {
         await addDoc(collection(db, 'subjects'), subjectData);
+        toast.success('Subject created successfully!');
       }
       resetForm();
     } catch (error) {
       console.error('Error saving subject:', error);
-      alert('Failed to save subject');
+      toast.error('Failed to save subject. Please try again.');
     }
   };
 
@@ -67,16 +70,17 @@ const Subjects = () => {
     const tasksSnapshot = await getDocs(tasksQuery);
 
     if (tasksSnapshot.size > 0) {
-      alert(`Cannot delete this subject. It has ${tasksSnapshot.size} task(s) associated with it.`);
+      toast.error(`Cannot delete this subject. It has ${tasksSnapshot.size} task(s) associated with it.`);
       return;
     }
 
     if (window.confirm('Are you sure you want to delete this subject?')) {
       try {
         await deleteDoc(doc(db, 'subjects', subjectId));
+        toast.success('Subject deleted successfully!');
       } catch (error) {
         console.error('Error deleting subject:', error);
-        alert('Failed to delete subject');
+        toast.error('Failed to delete subject. Please try again.');
       }
     }
   };

@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { X, LayoutDashboard, CheckSquare, Megaphone, Flag, Users, BookOpen } from 'lucide-react';
+import { X, LayoutDashboard, CheckSquare, Megaphone, Flag, Users } from 'lucide-react';
 
 const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
   const navItems = [
@@ -8,7 +8,6 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
     { path: '/announcements', icon: Megaphone, label: 'Announcements' },
     { path: '/reports', icon: Flag, label: 'Reports' },
     { path: '/users', icon: Users, label: 'Users' },
-    { path: '/subjects', icon: BookOpen, label: 'Subjects' },
   ];
 
   return (

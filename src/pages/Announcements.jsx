@@ -4,6 +4,7 @@ import { db } from '../lib/firebase';
 import { useAuth } from '../contexts/AuthContext';
 import { Plus, Edit, Trash2, X, Filter } from 'lucide-react';
 import { format, isAfter } from 'date-fns';
+import toast from 'react-hot-toast';
 
 const Announcements = () => {
   const { currentUser } = useAuth();
@@ -73,13 +74,15 @@ const Announcements = () => {
     try {
       if (editingAnnouncement) {
         await updateDoc(doc(db, 'announcements', editingAnnouncement.id), announcementData);
+        toast.success('Announcement updated successfully!');
       } else {
         await addDoc(collection(db, 'announcements'), announcementData);
+        toast.success('Announcement created successfully!');
       }
       resetForm();
     } catch (error) {
       console.error('Error saving announcement:', error);
-      alert('Failed to save announcement');
+      toast.error('Failed to save announcement. Please try again.');
     }
   };
 
@@ -97,16 +100,17 @@ const Announcements = () => {
   const handleDelete = async (announcement) => {
     // Only allow deletion of own announcements (as per requirements)
     if (announcement.authorId !== currentUser.uid) {
-      alert('You can only delete your own announcements');
+      toast.error('You can only delete your own announcements');
       return;
     }
 
     if (window.confirm('Are you sure you want to delete this announcement?')) {
       try {
         await deleteDoc(doc(db, 'announcements', announcement.id));
+        toast.success('Announcement deleted successfully!');
       } catch (error) {
         console.error('Error deleting announcement:', error);
-        alert('Failed to delete announcement');
+        toast.error('Failed to delete announcement. Please try again.');
       }
     }
   };
