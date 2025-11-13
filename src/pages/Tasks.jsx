@@ -301,7 +301,7 @@ const Tasks = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <h1 className="text-3xl font-bold">Tasks Management</h1>
@@ -315,7 +315,7 @@ const Tasks = () => {
       </div>
 
       {/* Filters */}
-      <div className="bg-dark-600 border border-primary/20 rounded-xl p-4">
+      <div className="bg-dark-600 border border-primary/20 rounded-lg p-3 shadow-sm">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-secondary" size={20} />
@@ -349,48 +349,48 @@ const Tasks = () => {
           </div>
         ) : (
           filteredTasks.map(task => (
-            <div key={task.id} className="bg-dark-600 border border-primary/20 rounded-xl p-6 hover:border-primary/40 transition-colors">
-              <div className="flex flex-col sm:flex-row gap-4">
+            <div key={task.id} className="bg-dark-600 border border-primary/20 rounded-lg p-4 hover:border-primary/40 transition-all duration-200 hover:shadow-lg hover:shadow-primary/5">
+              <div className="flex flex-col sm:flex-row gap-3">
                 {task.imageUrl && (
-                  <div className="w-full sm:w-32 h-32 flex-shrink-0">
+                  <div className="w-full sm:w-24 h-24 flex-shrink-0">
                     <img 
                       src={task.imageUrl} 
                       alt={task.title}
-                      className="w-full h-full object-cover rounded-lg"
+                      className="w-full h-full object-cover rounded-md"
                     />
                   </div>
                 )}
-                <div className="flex-1">
-                  <div className="flex items-start gap-3 mb-2 flex-wrap">
-                    <h3 className="text-xl font-semibold">{task.title}</h3>
-                    <span className={`px-3 py-1 rounded-full text-xs border ${getStatusColor(task.status)}`}>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start gap-2 mb-2 flex-wrap">
+                    <h3 className="text-lg font-semibold truncate flex-1 min-w-0">{task.title}</h3>
+                    <span className={`px-2.5 py-0.5 rounded-full text-xs border ${getStatusColor(task.status)} whitespace-nowrap`}>
                       {task.status}
                     </span>
                   </div>
-                  <p className="text-secondary mb-3 whitespace-pre-wrap">{task.description}</p>
-                  <div className="flex flex-wrap gap-4 text-sm text-secondary">
+                  <p className="text-secondary text-sm mb-2 line-clamp-2">{task.description}</p>
+                  <div className="flex flex-wrap gap-3 text-xs text-secondary">
                     {task.subject && (
                       <span className="flex items-center gap-1">
                         📚 <span className="font-medium text-primary">{task.subject}</span>
                       </span>
                     )}
-                    <span>📅 {task.deadline ? (typeof task.deadline.toDate === 'function' ? format(task.deadline.toDate(), 'MMM dd, yyyy') : format(new Date(task.deadline), 'MMM dd, yyyy')) : 'No deadline'}</span>
+                    <span className="flex items-center gap-1">📅 {task.deadline ? (typeof task.deadline.toDate === 'function' ? format(task.deadline.toDate(), 'MMM dd, yyyy') : format(new Date(task.deadline), 'MMM dd, yyyy')) : 'No deadline'}</span>
                   </div>
                 </div>
-                <div className="flex sm:flex-col gap-2">
+                <div className="flex sm:flex-col gap-1.5">
                   <button
                     onClick={() => handleEdit(task)}
-                    className="p-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-lg transition-colors"
+                    className="p-1.5 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-md transition-colors"
                     title="Edit task"
                   >
-                    <Edit size={18} />
+                    <Edit size={16} />
                   </button>
                   <button
                     onClick={() => handleDelete(task.id)}
-                    className="p-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg transition-colors"
+                    className="p-1.5 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-md transition-colors"
                     title="Delete task"
                   >
-                    <Trash2 size={18} />
+                    <Trash2 size={16} />
                   </button>
                 </div>
               </div>

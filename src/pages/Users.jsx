@@ -138,7 +138,7 @@ const Users = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <h1 className="text-3xl font-bold">Users Management</h1>
@@ -146,46 +146,46 @@ const Users = () => {
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-dark-600 border border-primary/20 rounded-xl p-4">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-primary/10 rounded-lg">
-              <UsersIcon className="text-primary" size={20} />
+        <div className="bg-dark-600 border border-primary/20 rounded-lg p-3 hover:border-primary/30 transition-all duration-200">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="p-1.5 bg-primary/10 rounded-lg">
+              <UsersIcon className="text-primary" size={16} />
             </div>
-            <span className="text-2xl font-bold">{stats.total}</span>
+            <span className="text-xl font-bold">{stats.total}</span>
           </div>
-          <p className="text-sm text-secondary">Total Users</p>
+          <p className="text-xs text-secondary">Total Users</p>
         </div>
-        <div className="bg-dark-600 border border-primary/20 rounded-xl p-4">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-blue-500/10 rounded-lg">
-              <UsersIcon className="text-blue-400" size={20} />
+        <div className="bg-dark-600 border border-primary/20 rounded-lg p-3 hover:border-primary/30 transition-all duration-200">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="p-1.5 bg-blue-500/10 rounded-lg">
+              <UsersIcon className="text-blue-400" size={16} />
             </div>
-            <span className="text-2xl font-bold">{stats.students}</span>
+            <span className="text-xl font-bold">{stats.students}</span>
           </div>
-          <p className="text-sm text-secondary">Students</p>
+          <p className="text-xs text-secondary">Students</p>
         </div>
-        <div className="bg-dark-600 border border-primary/20 rounded-xl p-4">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-purple-500/10 rounded-lg">
-              <UserCheck className="text-purple-400" size={20} />
+        <div className="bg-dark-600 border border-primary/20 rounded-lg p-3 hover:border-primary/30 transition-all duration-200">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="p-1.5 bg-purple-500/10 rounded-lg">
+              <UserCheck className="text-purple-400" size={16} />
             </div>
-            <span className="text-2xl font-bold">{stats.officers}</span>
+            <span className="text-xl font-bold">{stats.officers}</span>
           </div>
-          <p className="text-sm text-secondary">Officers</p>
+          <p className="text-xs text-secondary">Officers</p>
         </div>
-        <div className="bg-dark-600 border border-primary/20 rounded-xl p-4">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-red-500/10 rounded-lg">
-              <Shield className="text-red-400" size={20} />
+        <div className="bg-dark-600 border border-primary/20 rounded-lg p-3 hover:border-primary/30 transition-all duration-200">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="p-1.5 bg-red-500/10 rounded-lg">
+              <Shield className="text-red-400" size={16} />
             </div>
-            <span className="text-2xl font-bold">{stats.admins}</span>
+            <span className="text-xl font-bold">{stats.admins}</span>
           </div>
-          <p className="text-sm text-secondary">Admins</p>
+          <p className="text-xs text-secondary">Admins</p>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="bg-dark-600 border border-primary/20 rounded-xl p-4">
+      <div className="bg-dark-600 border border-primary/20 rounded-lg p-3">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-secondary" size={20} />
@@ -212,10 +212,10 @@ const Users = () => {
       </div>
 
       {/* Users Table/Cards */}
-      <div className="bg-dark-600 border border-primary/20 rounded-xl overflow-hidden">
+      <div className="bg-dark-600 border border-primary/20 rounded-lg overflow-hidden">
         {filteredUsers.length === 0 ? (
-          <div className="p-8 text-center">
-            <p className="text-secondary">No users found</p>
+          <div className="p-6 text-center">
+            <p className="text-secondary text-sm">No users found</p>
           </div>
         ) : (
           <>
@@ -224,10 +224,10 @@ const Users = () => {
               <table className="w-full">
                 <thead className="bg-dark-700 border-b border-primary/20">
                   <tr>
-                    <th className="px-6 py-3 text-left text-sm font-medium">Name</th>
-                    <th className="px-6 py-3 text-left text-sm font-medium">Email</th>
-                    <th className="px-6 py-3 text-left text-sm font-medium">Role</th>
-                    <th className="px-6 py-3 text-left text-sm font-medium">Joined</th>
+                    <th className="px-4 py-2.5 text-left text-xs font-medium">Name</th>
+                    <th className="px-4 py-2.5 text-left text-xs font-medium">Email</th>
+                    <th className="px-4 py-2.5 text-left text-xs font-medium">Role</th>
+                    <th className="px-4 py-2.5 text-left text-xs font-medium">Joined</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-primary/10">
@@ -235,24 +235,24 @@ const Users = () => {
                     const RoleIcon = getRoleIcon(user.role);
                     return (
                       <tr key={user.id} className="hover:bg-dark-700/50 transition-colors">
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center">
-                              <span className="text-primary font-medium">
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-2.5">
+                            <div className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center flex-shrink-0">
+                              <span className="text-primary font-medium text-sm">
                                 {user.firstName?.[0]}{user.lastName?.[0]}
                               </span>
                             </div>
-                            <span className="font-medium">{user.firstName} {user.lastName}</span>
+                            <span className="font-medium text-sm truncate">{user.firstName} {user.lastName}</span>
                           </div>
                         </td>
-                        <td className="px-6 py-4 text-secondary">{user.email}</td>
-                        <td className="px-6 py-4">
-                          <span className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs border ${getRoleColor(user.role)}`}>
-                            <RoleIcon size={14} />
+                        <td className="px-4 py-3 text-secondary text-sm">{user.email}</td>
+                        <td className="px-4 py-3">
+                          <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs border ${getRoleColor(user.role)}`}>
+                            <RoleIcon size={12} />
                             {user.role}
                           </span>
                         </td>
-                        <td className="px-6 py-4 text-secondary">
+                        <td className="px-4 py-3 text-secondary text-xs">
                           {user.createdAt ? (typeof user.createdAt.toDate === 'function' ? format(user.createdAt.toDate(), 'MMM dd, yyyy') : format(new Date(user.createdAt), 'MMM dd, yyyy')) : 'N/A'}
                         </td>
                       </tr>

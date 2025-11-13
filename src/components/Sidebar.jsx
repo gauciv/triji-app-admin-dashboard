@@ -1,13 +1,14 @@
 import { NavLink } from 'react-router-dom';
-import { X, LayoutDashboard, CheckSquare, Megaphone, Flag, Users } from 'lucide-react';
+import { X, LayoutDashboard, CheckSquare, Megaphone, Flag, Users, MessageSquare } from 'lucide-react';
 
 const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
-  const navItems = [
-    { path: '/', icon: LayoutDashboard, label: 'Dashboard' },
-    { path: '/tasks', icon: CheckSquare, label: 'Tasks' },
-    { path: '/announcements', icon: Megaphone, label: 'Announcements' },
-    { path: '/reports', icon: Flag, label: 'Reports' },
-    { path: '/users', icon: Users, label: 'Users' },
+    const navItems = [
+    { path: '/', label: 'Dashboard', icon: LayoutDashboard },
+    { path: '/tasks', label: 'Tasks', icon: CheckSquare },
+    { path: '/announcements', label: 'Announcements', icon: Megaphone },
+    { path: '/freedom-wall', label: 'Freedom Wall', icon: MessageSquare },
+    { path: '/reports', label: 'Reports', icon: Flag },
+    { path: '/users', label: 'Users', icon: Users },
   ];
 
   return (

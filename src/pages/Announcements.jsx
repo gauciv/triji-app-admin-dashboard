@@ -196,7 +196,7 @@ const Announcements = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <h1 className="text-3xl font-bold">Announcements Management</h1>
@@ -210,7 +210,7 @@ const Announcements = () => {
       </div>
 
       {/* Filters */}
-      <div className="bg-dark-600 border border-primary/20 rounded-xl p-4">
+      <div className="bg-dark-600 border border-primary/20 rounded-lg p-3 shadow-sm">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <select
             value={filterType}
@@ -246,25 +246,25 @@ const Announcements = () => {
           filteredAnnouncements.map(announcement => (
             <div 
               key={announcement.id} 
-              className={`bg-dark-600 border rounded-xl p-6 hover:border-primary/40 transition-colors ${
+              className={`bg-dark-600 border rounded-lg p-4 hover:border-primary/40 transition-all duration-200 hover:shadow-lg hover:shadow-primary/5 ${
                 isExpired(announcement.expiresAt) ? 'border-gray-500/20 opacity-60' : 'border-primary/20'
               }`}
             >
-              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-                <div className="flex-1">
-                  <div className="flex items-start gap-3 mb-2 flex-wrap">
-                    <h3 className="text-xl font-semibold">{announcement.title}</h3>
-                    <span className={`px-3 py-1 rounded-full text-xs border ${getTypeColor(announcement.type)}`}>
+              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start gap-2 mb-2 flex-wrap">
+                    <h3 className="text-lg font-semibold truncate flex-1 min-w-0">{announcement.title}</h3>
+                    <span className={`px-2.5 py-0.5 rounded-full text-xs border ${getTypeColor(announcement.type)} whitespace-nowrap`}>
                       {announcement.type}
                     </span>
                     {isExpired(announcement.expiresAt) && (
-                      <span className="px-3 py-1 rounded-full text-xs border bg-gray-500/20 text-gray-400 border-gray-500/50">
+                      <span className="px-2.5 py-0.5 rounded-full text-xs border bg-gray-500/20 text-gray-400 border-gray-500/50 whitespace-nowrap">
                         Expired
                       </span>
                     )}
                   </div>
-                  <p className="text-secondary mb-3 whitespace-pre-wrap">{announcement.content}</p>
-                  <div className="flex flex-wrap gap-4 text-sm text-secondary">
+                  <p className="text-secondary text-sm mb-3 whitespace-pre-wrap line-clamp-3">{announcement.content}</p>
+                  <div className="flex flex-wrap gap-3 text-xs text-secondary">
                     <span>By: {announcement.authorName}</span>
                     <span>Posted: {announcement.createdAt ? format(announcement.createdAt.toDate(), 'MMM dd, yyyy') : 'N/A'}</span>
                     {announcement.expiresAt && (
@@ -272,20 +272,21 @@ const Announcements = () => {
                     )}
                   </div>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-1.5">
                   <button
                     onClick={() => handleEdit(announcement)}
-                    className="p-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-lg transition-colors"
+                    className="p-1.5 bg-blue-500/20 hover:bg-blue-500/30 text-blue-400 rounded-md transition-colors"
+                    title="Edit"
                   >
-                    <Edit size={18} />
+                    <Edit size={16} />
                   </button>
                   <button
                     onClick={() => handleDelete(announcement)}
-                    className="p-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg transition-colors"
+                    className="p-1.5 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={announcement.authorId !== currentUser.uid}
-                    title={announcement.authorId !== currentUser.uid ? 'Can only delete your own announcements' : ''}
+                    title={announcement.authorId !== currentUser.uid ? 'Can only delete your own announcements' : 'Delete'}
                   >
-                    <Trash2 size={18} />
+                    <Trash2 size={16} />
                   </button>
                 </div>
               </div>

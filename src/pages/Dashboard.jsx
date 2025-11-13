@@ -134,7 +134,7 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Welcome Header */}
       <div>
         <h1 className="text-3xl font-bold mb-2">Welcome back!</h1>
@@ -142,55 +142,55 @@ const Dashboard = () => {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {statCards.map((stat) => (
           <div
             key={stat.title}
-            className="bg-dark-600 border border-primary/20 rounded-xl p-6"
+            className="bg-dark-600 border border-primary/20 rounded-lg p-3 hover:border-primary/30 transition-all duration-200"
           >
-            <div className="flex items-center justify-between mb-4">
-              <div className={`${stat.bgColor} ${stat.color} p-3 rounded-lg`}>
-                <stat.icon size={24} />
+            <div className="flex items-center gap-2 mb-2">
+              <div className={`${stat.bgColor} ${stat.color} p-1.5 rounded-lg`}>
+                <stat.icon size={16} />
               </div>
+              <h3 className="text-xl font-bold">{stat.value}</h3>
             </div>
-            <h3 className="text-2xl font-bold mb-1">{stat.value}</h3>
-            <p className="text-sm text-secondary">{stat.title}</p>
+            <p className="text-xs text-secondary">{stat.title}</p>
           </div>
         ))}
       </div>
 
       {/* Recent Activity */}
-      <div className="bg-dark-600 border border-primary/20 rounded-xl p-6">
-        <h2 className="text-xl font-bold mb-4">Recent Activity</h2>
+      <div className="bg-dark-600 border border-primary/20 rounded-lg p-4">
+        <h2 className="text-lg font-bold mb-3">Recent Activity</h2>
         {recentActivity.length === 0 ? (
-          <p className="text-secondary text-center py-8">No recent activity</p>
+          <p className="text-secondary text-center py-6 text-sm">No recent activity</p>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-2">
             {recentActivity.map((item) => (
               <div
                 key={item.id}
-                className="flex items-start gap-4 p-4 bg-dark-700 rounded-lg hover:bg-dark-800 transition-colors"
+                className="flex items-start gap-3 p-3 bg-dark-700 rounded-lg hover:bg-dark-800 transition-colors"
               >
                 <div
-                  className={`p-2 rounded-lg ${
+                  className={`p-1.5 rounded-lg ${
                     item.type === 'task'
                       ? 'bg-blue-400/10 text-blue-400'
                       : 'bg-purple-400/10 text-purple-400'
                   }`}
                 >
                   {item.type === 'task' ? (
-                    <CheckSquare size={20} />
+                    <CheckSquare size={16} />
                   ) : (
-                    <Megaphone size={20} />
+                    <Megaphone size={16} />
                   )}
                 </div>
-                <div className="flex-1">
-                  <h3 className="font-medium mb-1">{item.title}</h3>
-                  <p className="text-sm text-secondary line-clamp-1">
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-medium text-sm mb-1 truncate">{item.title}</h3>
+                  <p className="text-xs text-secondary line-clamp-1">
                     {item.description || item.content}
                   </p>
                   {item.createdAt && (
-                    <p className="text-xs text-secondary mt-2">
+                    <p className="text-xs text-secondary mt-1">
                       {formatDistanceToNow(item.createdAt.toDate(), {
                         addSuffix: true,
                       })}

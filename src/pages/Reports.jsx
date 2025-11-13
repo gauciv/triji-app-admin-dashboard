@@ -136,7 +136,7 @@ const Reports = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <h1 className="text-3xl font-bold">Reports Management</h1>
@@ -148,7 +148,7 @@ const Reports = () => {
       </div>
 
       {/* Filters */}
-      <div className="bg-dark-600 border border-primary/20 rounded-xl p-4">
+      <div className="bg-dark-600 border border-primary/20 rounded-lg p-3 shadow-sm">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-secondary" size={20} />
@@ -182,7 +182,7 @@ const Reports = () => {
           </div>
         ) : (
           filteredReports.map(report => (
-            <div key={report.id} className="bg-dark-600 border border-primary/20 rounded-xl p-6 hover:border-primary/40 transition-colors">
+            <div key={report.id} className="bg-dark-600 border border-primary/20 rounded-lg p-4 hover:border-primary/40 transition-all duration-200 hover:shadow-lg hover:shadow-primary/5">
               <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
                 <div className="flex-1">
                   <div className="flex items-start gap-3 mb-3 flex-wrap">

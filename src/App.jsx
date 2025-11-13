@@ -9,6 +9,7 @@ import Tasks from './pages/Tasks';
 import Announcements from './pages/Announcements';
 import Reports from './pages/Reports';
 import Users from './pages/Users';
+import FreedomWall from './pages/FreedomWall';
 
 function App() {
   return (
@@ -52,6 +53,7 @@ function App() {
             <Route path="announcements" element={<Announcements />} />
             <Route path="reports" element={<Reports />} />
             <Route path="users" element={<Users />} />
+            <Route path="freedom-wall" element={<FreedomWall />} />
           </Route>
         </Routes>
       </AuthProvider>
