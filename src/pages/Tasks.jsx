@@ -39,6 +39,12 @@ const Tasks = () => {
       return;
     }
     
+    if (!currentUser) {
+      setError('Please log in to view tasks.');
+      setLoading(false);
+      return;
+    }
+    
     try {
       const tasksQuery = query(collection(db, 'tasks'), orderBy('createdAt', 'desc'));
       unsubscribe = onSnapshot(
@@ -55,7 +61,12 @@ const Tasks = () => {
         },
         (err) => {
           console.error('Error fetching tasks:', err);
-          setError('Failed to load tasks. Please check your Firebase configuration and try again.');
+          // Check for permission errors
+          if (err.code === 'permission-denied') {
+            setError('Access denied. You do not have permission to view tasks. Admin privileges required.');
+          } else {
+            setError(`Failed to load tasks: ${err.message}`);
+          }
           setLoading(false);
         }
       );
@@ -68,7 +79,7 @@ const Tasks = () => {
     return () => {
       if (unsubscribe) unsubscribe();
     };
-  }, []);
+  }, [currentUser]);
 
   // Filter tasks
   useEffect(() => {
@@ -147,7 +158,11 @@ const Tasks = () => {
       resetForm();
     } catch (error) {
       console.error('Error saving task:', error);
-      toast.error(error.message || 'Failed to save task. Please try again.');
+      if (error.code === 'permission-denied') {
+        toast.error('Access denied. Admin privileges required to create/edit tasks.');
+      } else {
+        toast.error(error.message || 'Failed to save task. Please try again.');
+      }
     } finally {
       setUploading(false);
     }
@@ -155,11 +170,24 @@ const Tasks = () => {
 
   const handleEdit = (task) => {
     setEditingTask(task);
+    
+    let deadlineValue = '';
+    if (task.deadline) {
+      try {
+        const deadlineDate = typeof task.deadline.toDate === 'function' 
+          ? task.deadline.toDate() 
+          : new Date(task.deadline);
+        deadlineValue = deadlineDate.toISOString().split('T')[0];
+      } catch (err) {
+        console.error('Error parsing deadline:', err);
+      }
+    }
+    
     setFormData({
       title: task.title || '',
       description: task.description || '',
       subject: task.subject || '',
-      deadline: task.deadline?.toDate().toISOString().split('T')[0] || '',
+      deadline: deadlineValue,
       status: task.status || 'Pending'
     });
     setImagePreview(task.imageUrl || null);
@@ -173,7 +201,11 @@ const Tasks = () => {
         toast.success('Task deleted successfully!');
       } catch (error) {
         console.error('Error deleting task:', error);
-        toast.error('Failed to delete task. Please try again.');
+        if (error.code === 'permission-denied') {
+          toast.error('Access denied. Admin privileges required to delete tasks.');
+        } else {
+          toast.error('Failed to delete task. Please try again.');
+        }
       }
     }
   };
@@ -317,7 +349,7 @@ const Tasks = () => {
                         📚 <span className="font-medium text-primary">{task.subject}</span>
                       </span>
                     )}
-                    <span>📅 {task.deadline ? format(task.deadline.toDate(), 'MMM dd, yyyy') : 'No deadline'}</span>
+                    <span>📅 {task.deadline ? (typeof task.deadline.toDate === 'function' ? format(task.deadline.toDate(), 'MMM dd, yyyy') : format(new Date(task.deadline), 'MMM dd, yyyy')) : 'No deadline'}</span>
                   </div>
                 </div>
                 <div className="flex sm:flex-col gap-2">

@@ -11,6 +11,7 @@ const Announcements = () => {
   const [announcements, setAnnouncements] = useState([]);
   const [filteredAnnouncements, setFilteredAnnouncements] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [editingAnnouncement, setEditingAnnouncement] = useState(null);
   const [filterType, setFilterType] = useState('All');
@@ -23,19 +24,38 @@ const Announcements = () => {
   });
 
   useEffect(() => {
-    const announcementsQuery = query(collection(db, 'announcements'), orderBy('createdAt', 'desc'));
-    const unsubscribe = onSnapshot(announcementsQuery, (snapshot) => {
-      const announcementsData = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-      setAnnouncements(announcementsData);
-      setFilteredAnnouncements(announcementsData);
+    if (!db || !currentUser) {
+      setError('Not authenticated or database unavailable.');
       setLoading(false);
-    });
+      return;
+    }
+
+    const announcementsQuery = query(collection(db, 'announcements'), orderBy('createdAt', 'desc'));
+    const unsubscribe = onSnapshot(
+      announcementsQuery, 
+      (snapshot) => {
+        const announcementsData = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        setAnnouncements(announcementsData);
+        setFilteredAnnouncements(announcementsData);
+        setLoading(false);
+        setError(null);
+      },
+      (err) => {
+        console.error('Error fetching announcements:', err);
+        if (err.code === 'permission-denied') {
+          setError('Access denied. You do not have permission to view announcements.');
+        } else {
+          setError(`Failed to load announcements: ${err.message}`);
+        }
+        setLoading(false);
+      }
+    );
 
     return () => unsubscribe();
-  }, []);
+  }, [currentUser]);
 
   // Filter announcements
   useEffect(() => {
@@ -82,7 +102,11 @@ const Announcements = () => {
       resetForm();
     } catch (error) {
       console.error('Error saving announcement:', error);
-      toast.error('Failed to save announcement. Please try again.');
+      if (error.code === 'permission-denied') {
+        toast.error('Access denied. You do not have permission to create/edit announcements.');
+      } else {
+        toast.error('Failed to save announcement. Please try again.');
+      }
     }
   };
 

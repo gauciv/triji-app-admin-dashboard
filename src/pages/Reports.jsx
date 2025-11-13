@@ -9,20 +9,40 @@ const Reports = () => {
   const [reports, setReports] = useState([]);
   const [filteredReports, setFilteredReports] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('All');
 
   useEffect(() => {
-    const reportsQuery = query(collection(db, 'reports'), orderBy('reportedAt', 'desc'));
-    const unsubscribe = onSnapshot(reportsQuery, (snapshot) => {
-      const reportsData = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-      setReports(reportsData);
-      setFilteredReports(reportsData);
+    if (!db) {
+      setError('Database connection unavailable.');
       setLoading(false);
-    });
+      return;
+    }
+
+    const reportsQuery = query(collection(db, 'reports'), orderBy('reportedAt', 'desc'));
+    const unsubscribe = onSnapshot(
+      reportsQuery, 
+      (snapshot) => {
+        const reportsData = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        setReports(reportsData);
+        setFilteredReports(reportsData);
+        setLoading(false);
+        setError(null);
+      },
+      (err) => {
+        console.error('Error fetching reports:', err);
+        if (err.code === 'permission-denied') {
+          setError('Access denied. Admin privileges required to view reports.');
+        } else {
+          setError(`Failed to load reports: ${err.message}`);
+        }
+        setLoading(false);
+      }
+    );
 
     return () => unsubscribe();
   }, []);
@@ -53,7 +73,11 @@ const Reports = () => {
       toast.success(`Report marked as ${newStatus.toLowerCase()}!`);
     } catch (error) {
       console.error('Error updating report status:', error);
-      toast.error('Failed to update report status. Please try again.');
+      if (error.code === 'permission-denied') {
+        toast.error('Access denied. Admin privileges required to update reports.');
+      } else {
+        toast.error('Failed to update report status. Please try again.');
+      }
     }
   };
 
@@ -64,7 +88,11 @@ const Reports = () => {
         toast.success('Report deleted successfully!');
       } catch (error) {
         console.error('Error deleting report:', error);
-        toast.error('Failed to delete report. Please try again.');
+        if (error.code === 'permission-denied') {
+          toast.error('Access denied. Admin privileges required to delete reports.');
+        } else {
+          toast.error('Failed to delete report. Please try again.');
+        }
       }
     }
   };

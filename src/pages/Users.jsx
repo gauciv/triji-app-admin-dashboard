@@ -8,6 +8,7 @@ const Users = () => {
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterRole, setFilterRole] = useState('All');
   const [stats, setStats] = useState({
@@ -21,6 +22,7 @@ const Users = () => {
     // Check if Firebase is initialized
     if (!db) {
       console.error('Firebase db is not initialized');
+      setError('Database connection not available.');
       setLoading(false);
       return;
     }
@@ -47,14 +49,21 @@ const Users = () => {
           };
           setStats(newStats);
           setLoading(false);
+          setError(null);
         },
-        (error) => {
-          console.error('Error fetching users:', error);
+        (err) => {
+          console.error('Error fetching users:', err);
+          if (err.code === 'permission-denied') {
+            setError('Access denied. Admin privileges required to view users.');
+          } else {
+            setError(`Failed to load users: ${err.message}`);
+          }
           setLoading(false);
         }
       );
-    } catch (error) {
-      console.error('Error setting up users listener:', error);
+    } catch (err) {
+      console.error('Error setting up users listener:', err);
+      setError('Failed to initialize users list.');
       setLoading(false);
     }
 
@@ -101,6 +110,29 @@ const Users = () => {
     return (
       <div className="flex items-center justify-center h-full">
         <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <h1 className="text-3xl font-bold">Users Management</h1>
+        <div className="bg-dark-600 border border-red-500/30 rounded-xl p-8 text-center">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-red-500/20 rounded-full mb-4">
+            <svg className="w-8 h-8 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <h3 className="text-xl font-bold mb-2">Failed to Load Users</h3>
+          <p className="text-secondary mb-4">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="bg-primary hover:bg-primary/90 text-dark-900 font-medium px-6 py-2 rounded-lg transition-colors"
+          >
+            Retry
+          </button>
+        </div>
       </div>
     );
   }

@@ -6,8 +6,7 @@ import {
   setPersistence,
   browserLocalPersistence
 } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
-import { auth, db, isDemoMode } from '../lib/firebase';
+import { auth, isDemoMode } from '../lib/firebase';
 
 const AuthContext = createContext();
 
@@ -21,7 +20,6 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
-  const [userRole, setUserRole] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -39,43 +37,9 @@ export const AuthProvider = ({ children }) => {
         console.error('Failed to set persistence:', err);
       });
 
-      const unsubscribe = onAuthStateChanged(auth, async (user) => {
-        if (user) {
-          // Check user role in Firestore
-          try {
-            const userDocRef = doc(db, 'users', user.uid);
-            const userDoc = await getDoc(userDocRef);
-            
-            if (userDoc.exists()) {
-              const userData = userDoc.data();
-              const role = userData.role;
-              
-              // Only allow admin users
-              if (role === 'admin') {
-                setCurrentUser(user);
-                setUserRole(role);
-              } else {
-                // User is not an admin, log them out silently
-                await signOut(auth);
-                setCurrentUser(null);
-                setUserRole(null);
-              }
-            } else {
-              // User document doesn't exist in Firestore
-              await signOut(auth);
-              setCurrentUser(null);
-              setUserRole(null);
-            }
-          } catch (err) {
-            console.error('Error fetching user role:', err);
-            await signOut(auth);
-            setCurrentUser(null);
-            setUserRole(null);
-          }
-        } else {
-          setCurrentUser(null);
-          setUserRole(null);
-        }
+      // Simply track auth state - let Firebase Rules handle authorization
+      const unsubscribe = onAuthStateChanged(auth, (user) => {
+        setCurrentUser(user);
         setLoading(false);
       }, (err) => {
         console.error('Auth state change error:', err);
@@ -93,22 +57,6 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       const result = await signInWithEmailAndPassword(auth, email, password);
-      
-      // Check user role immediately after login
-      const userDocRef = doc(db, 'users', result.user.uid);
-      const userDoc = await getDoc(userDocRef);
-      
-      if (!userDoc.exists()) {
-        await signOut(auth);
-        throw new Error('User profile not found. Please contact administrator.');
-      }
-      
-      const userData = userDoc.data();
-      if (userData.role !== 'admin') {
-        await signOut(auth);
-        throw new Error('Access denied. Admin privileges required.');
-      }
-      
       return result;
     } catch (error) {
       throw error;
@@ -125,7 +73,6 @@ export const AuthProvider = ({ children }) => {
 
   const value = {
     currentUser,
-    userRole,
     login,
     logout,
     loading,
