@@ -14,7 +14,7 @@ const Login = () => {
 
   // Redirect if already logged in
   if (currentUser) {
-    return <Navigate to="/admin" replace />;
+    return <Navigate to="/dashboard" replace />;
   }
 
   const handleSubmit = async (e) => {
@@ -31,7 +31,7 @@ const Login = () => {
 
     try {
       await login(email, password);
-      navigate('/admin');
+      navigate('/dashboard');
     } catch (error) {
       console.error('Login error:', error);
       

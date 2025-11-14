@@ -42,11 +42,13 @@ function App() {
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<Download />} />
-          <Route path="/login" element={<Login />} />
           
-          {/* Protected Admin Routes */}
+          {/* Admin Routes - Login or Dashboard */}
+          <Route path="/admin" element={<Login />} />
+          
+          {/* Protected Admin Dashboard Routes */}
           <Route
-            path="/admin"
+            path="/dashboard"
             element={
               <ProtectedRoute>
                 <Layout />

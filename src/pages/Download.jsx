@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Download as DownloadIcon, Shield, AlertCircle, WifiOff, RefreshCw } from 'lucide-react';
+import { Download as DownloadIcon, AlertCircle, WifiOff, RefreshCw } from 'lucide-react';
 
 const Download = () => {
-  const navigate = useNavigate();
   const [releaseInfo, setReleaseInfo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [downloading, setDownloading] = useState(false);
@@ -229,17 +227,6 @@ const Download = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-dark-900 via-dark-800 to-dark-900 flex items-center justify-center p-4">
-      {/* Admin Login Button - Top Right */}
-      <button
-        onClick={() => navigate('/login')}
-        className="fixed top-3 right-3 sm:top-4 sm:right-4 z-50 flex items-center gap-2 px-3 py-2 bg-dark-600/80 backdrop-blur-sm border border-primary/30 rounded-lg hover:bg-dark-600 hover:border-primary/50 transition-all duration-200 text-xs sm:text-sm"
-        title="Admin Login"
-        aria-label="Admin Login"
-      >
-        <span className="text-secondary">Admin?</span>
-        <span className="text-primary font-medium">Login Here</span>
-      </button>
-
       {/* Main Content */}
       <div className="w-full max-w-md px-2">
         {/* Logo/Brand */}
