@@ -3,12 +3,12 @@ import { X, LayoutDashboard, CheckSquare, Megaphone, Flag, Users, MessageSquare 
 
 const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
     const navItems = [
-    { path: '/', label: 'Dashboard', icon: LayoutDashboard },
-    { path: '/tasks', label: 'Tasks', icon: CheckSquare },
-    { path: '/announcements', label: 'Announcements', icon: Megaphone },
-    { path: '/freedom-wall', label: 'Freedom Wall', icon: MessageSquare },
-    { path: '/reports', label: 'Reports', icon: Flag },
-    { path: '/users', label: 'Users', icon: Users },
+    { path: '/admin', label: 'Dashboard', icon: LayoutDashboard },
+    { path: '/admin/tasks', label: 'Tasks', icon: CheckSquare },
+    { path: '/admin/announcements', label: 'Announcements', icon: Megaphone },
+    { path: '/admin/freedom-wall', label: 'Freedom Wall', icon: MessageSquare },
+    { path: '/admin/reports', label: 'Reports', icon: Flag },
+    { path: '/admin/users', label: 'Users', icon: Users },
   ];
 
   return (
@@ -53,7 +53,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
               <NavLink
                 key={item.path}
                 to={item.path}
-                end={item.path === '/'}
+                end={item.path === '/admin'}
                 onClick={() => setSidebarOpen(false)}
                 className={({ isActive }) =>
                   `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${

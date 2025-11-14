@@ -3,6 +3,7 @@ import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
+import Download from './pages/Download';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Tasks from './pages/Tasks';
@@ -39,9 +40,13 @@ function App() {
           }}
         />
         <Routes>
+          {/* Public Routes */}
+          <Route path="/" element={<Download />} />
           <Route path="/login" element={<Login />} />
+          
+          {/* Protected Admin Routes */}
           <Route
-            path="/"
+            path="/admin"
             element={
               <ProtectedRoute>
                 <Layout />

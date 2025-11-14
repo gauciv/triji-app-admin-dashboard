@@ -14,7 +14,7 @@ const Login = () => {
 
   // Redirect if already logged in
   if (currentUser) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/admin" replace />;
   }
 
   const handleSubmit = async (e) => {
@@ -31,7 +31,7 @@ const Login = () => {
 
     try {
       await login(email, password);
-      navigate('/');
+      navigate('/admin');
     } catch (error) {
       console.error('Login error:', error);
       
@@ -192,6 +192,15 @@ const Login = () => {
               )}
             </button>
           </form>
+
+          <div className="mt-6 text-center">
+            <button
+              onClick={() => navigate('/')}
+              className="text-sm text-secondary hover:text-primary transition-colors"
+            >
+              ← Back to Download Page
+            </button>
+          </div>
         </div>
       </div>
     </div>
