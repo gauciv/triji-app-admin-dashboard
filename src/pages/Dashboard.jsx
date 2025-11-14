@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { collection, query, onSnapshot, where, orderBy, limit } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { useAuth } from '../contexts/AuthContext';
-import { CheckSquare, Megaphone, Flag, Users } from 'lucide-react';
+import { CheckSquare, Megaphone, Flag, Users, MessageSquare, RefreshCw } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
 const Dashboard = () => {
@@ -15,6 +15,7 @@ const Dashboard = () => {
   });
   const [recentActivity, setRecentActivity] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     const unsubscribers = [];
@@ -51,11 +52,11 @@ const Dashboard = () => {
     });
     unsubscribers.push(unsubUsers);
 
-    // Listen to recent activity (tasks and announcements)
+    // Listen to recent activity (tasks, announcements, and freedom wall posts)
     const recentTasksQuery = query(
       collection(db, 'tasks'),
       orderBy('createdAt', 'desc'),
-      limit(3)
+      limit(5)
     );
     const unsubRecentTasks = onSnapshot(recentTasksQuery, (snapshot) => {
       const tasks = snapshot.docs.map((doc) => ({
@@ -67,7 +68,7 @@ const Dashboard = () => {
       const recentAnnouncementsQuery = query(
         collection(db, 'announcements'),
         orderBy('createdAt', 'desc'),
-        limit(2)
+        limit(5)
       );
       const unsubRecentAnnouncements = onSnapshot(
         recentAnnouncementsQuery,
@@ -78,11 +79,28 @@ const Dashboard = () => {
             ...doc.data(),
           }));
 
-          // Combine and sort by date
-          const combined = [...tasks, ...announcements].sort(
-            (a, b) => b.createdAt?.toMillis() - a.createdAt?.toMillis()
+          const recentFreedomWallQuery = query(
+            collection(db, 'freedom-wall-posts'),
+            orderBy('createdAt', 'desc'),
+            limit(5)
           );
-          setRecentActivity(combined.slice(0, 5));
+          const unsubRecentFreedomWall = onSnapshot(
+            recentFreedomWallQuery,
+            (freedomWallSnapshot) => {
+              const freedomWallPosts = freedomWallSnapshot.docs.map((doc) => ({
+                id: doc.id,
+                type: 'freedom-wall',
+                ...doc.data(),
+              }));
+
+              // Combine and sort by date
+              const combined = [...tasks, ...announcements, ...freedomWallPosts].sort(
+                (a, b) => b.createdAt?.toMillis() - a.createdAt?.toMillis()
+              );
+              setRecentActivity(combined.slice(0, 5));
+            }
+          );
+          unsubscribers.push(unsubRecentFreedomWall);
         }
       );
       unsubscribers.push(unsubRecentAnnouncements);
@@ -93,6 +111,14 @@ const Dashboard = () => {
       unsubscribers.forEach((unsub) => unsub());
     };
   }, []);
+
+  const handleRefresh = () => {
+    setRefreshing(true);
+    // Trigger a brief animation then stop
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 1000);
+  };
 
   const statCards = [
     {
@@ -161,7 +187,17 @@ const Dashboard = () => {
 
       {/* Recent Activity */}
       <div className="bg-dark-600 border border-primary/20 rounded-lg p-4">
-        <h2 className="text-lg font-bold mb-3">Recent Activity</h2>
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-lg font-bold">Recent Activity</h2>
+          <button
+            onClick={handleRefresh}
+            disabled={refreshing}
+            className="p-1.5 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg transition-colors disabled:opacity-50 cursor-pointer"
+            title="Refresh recent activity"
+          >
+            <RefreshCw size={16} className={refreshing ? 'animate-spin' : ''} />
+          </button>
+        </div>
         {recentActivity.length === 0 ? (
           <p className="text-secondary text-center py-6 text-sm">No recent activity</p>
         ) : (
@@ -175,17 +211,23 @@ const Dashboard = () => {
                   className={`p-1.5 rounded-lg ${
                     item.type === 'task'
                       ? 'bg-blue-400/10 text-blue-400'
-                      : 'bg-purple-400/10 text-purple-400'
+                      : item.type === 'announcement'
+                      ? 'bg-purple-400/10 text-purple-400'
+                      : 'bg-green-400/10 text-green-400'
                   }`}
                 >
                   {item.type === 'task' ? (
                     <CheckSquare size={16} />
-                  ) : (
+                  ) : item.type === 'announcement' ? (
                     <Megaphone size={16} />
+                  ) : (
+                    <MessageSquare size={16} />
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-medium text-sm mb-1 truncate">{item.title}</h3>
+                  <h3 className="font-medium text-sm mb-1 truncate">
+                    {item.title || (item.type === 'freedom-wall' ? 'Freedom Wall Post' : 'Untitled')}
+                  </h3>
                   <p className="text-xs text-secondary line-clamp-1">
                     {item.description || item.content}
                   </p>
