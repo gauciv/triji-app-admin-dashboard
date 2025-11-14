@@ -12,7 +12,7 @@ const Download = () => {
 
   // Configuration
   const GITHUB_REPO = 'gauciv/triji-app'; // Update this to your actual repo
-  const APK_PATH = '/triji-app.apk'; // Path to APK in public folder
+  const APK_URL = import.meta.env.VITE_APK_URL || 'https://github.com/gauciv/triji-app/releases/download/v1.3.1/triji-app-v1-3-1.apk'; // Can be local path or full URL
   const MAX_RETRIES = 3;
   const FETCH_TIMEOUT = 10000; // 10 seconds
 
@@ -147,30 +147,53 @@ const Download = () => {
     setDownloading(true);
     
     try {
-      // Check if APK file exists before attempting download
-      const checkResponse = await fetch(APK_PATH, { method: 'HEAD' });
+      // Check if it's an external URL (S3, GitHub, etc.)
+      const isExternalUrl = APK_URL.startsWith('http://') || APK_URL.startsWith('https://');
       
-      if (!checkResponse.ok) {
-        setError('apk-not-found');
-        setDownloading(false);
-        return;
-      }
+      if (isExternalUrl) {
+        // For external URLs, check if accessible then redirect
+        try {
+          const checkResponse = await fetch(APK_URL, { method: 'HEAD' });
+          if (!checkResponse.ok) {
+            setError('apk-not-found');
+            setDownloading(false);
+            return;
+          }
+        } catch (err) {
+          // If HEAD request fails, try direct download anyway
+          console.warn('HEAD check failed, attempting direct download');
+        }
+        
+        // Direct browser download for external URLs
+        window.location.href = APK_URL;
+        
+        setTimeout(() => setDownloading(false), 2000);
+      } else {
+        // For local files, check existence
+        const checkResponse = await fetch(APK_URL, { method: 'HEAD' });
+        
+        if (!checkResponse.ok) {
+          setError('apk-not-found');
+          setDownloading(false);
+          return;
+        }
 
-      // Create a secure download link
-      const link = document.createElement('a');
-      link.href = APK_PATH;
-      link.download = 'triji-app.apk';
-      link.rel = 'noopener noreferrer';
-      
-      // Trigger download
-      document.body.appendChild(link);
-      link.click();
-      
-      // Clean up
-      setTimeout(() => {
-        document.body.removeChild(link);
-        setDownloading(false);
-      }, 100);
+        // Create a secure download link for local files
+        const link = document.createElement('a');
+        link.href = APK_URL;
+        link.download = 'triji-app.apk';
+        link.rel = 'noopener noreferrer';
+        
+        // Trigger download
+        document.body.appendChild(link);
+        link.click();
+        
+        // Clean up
+        setTimeout(() => {
+          document.body.removeChild(link);
+          setDownloading(false);
+        }, 100);
+      }
       
     } catch (err) {
       console.error('Download error:', err);
@@ -326,11 +349,21 @@ const Download = () => {
               )}
 
               {/* Installation Note */}
-              <div className="p-2.5 sm:p-3 bg-orange-500/10 border border-orange-500/30 rounded-lg">
+              <div className="p-2.5 sm:p-3 bg-orange-500/10 border border-orange-500/30 rounded-lg mb-3">
                 <div className="flex items-start gap-2">
                   <AlertCircle className="text-orange-400 flex-shrink-0 mt-0.5" size={14} />
                   <p className="text-[10px] sm:text-xs text-secondary leading-snug">
                     Enable "Install from Unknown Sources" in your Android settings to install
+                  </p>
+                </div>
+              </div>
+
+              {/* iOS Notice */}
+              <div className="p-2.5 sm:p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+                <div className="flex items-start gap-2">
+                  <AlertCircle className="text-blue-400 flex-shrink-0 mt-0.5" size={14} />
+                  <p className="text-[10px] sm:text-xs text-secondary leading-snug">
+                    <span className="font-medium text-blue-400">iOS users:</span> Currently not supported on iOS devices. Android only.
                   </p>
                 </div>
               </div>
