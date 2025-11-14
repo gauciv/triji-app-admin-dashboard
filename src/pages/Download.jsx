@@ -7,6 +7,8 @@ const Download = () => {
   const [downloading, setDownloading] = useState(false);
   const [error, setError] = useState(null);
   const [retryCount, setRetryCount] = useState(0);
+  const [downloadStats, setDownloadStats] = useState(null);
+  const [fileSize, setFileSize] = useState(null);
 
   // Configuration
   const GITHUB_REPO = 'gauciv/triji-app'; // Update this to your actual repo
@@ -14,9 +16,95 @@ const Download = () => {
   const MAX_RETRIES = 3;
   const FETCH_TIMEOUT = 10000; // 10 seconds
 
-  useEffect(() => {
+    useEffect(() => {
     fetchReleaseInfo();
-  }, [retryCount]);
+    // File size will be fetched from GitHub API in fetchReleaseInfo
+  }, []);
+
+  const fetchAPKStats = async () => {
+    try {
+      // Fetch the specific release that contains the APK (v1.3.1)
+      const response = await fetch(
+        `https://api.github.com/repos/${GITHUB_REPO}/releases/tags/v1.3.1`,
+        {
+          headers: {
+            'Accept': 'application/vnd.github.v3+json',
+          },
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        
+        if (data.assets && Array.isArray(data.assets)) {
+          // Find the APK file
+          const apkAsset = data.assets.find(asset => 
+            asset.name && asset.name.toLowerCase().endsWith('.apk')
+          );
+          
+          if (apkAsset) {
+            console.log('APK asset found:', apkAsset.name);
+            
+            // Set download count from GitHub API
+            if (apkAsset.download_count !== undefined) {
+              console.log('Download count:', apkAsset.download_count);
+              setDownloadStats({
+                totalDownloads: apkAsset.download_count || 0,
+                fileName: apkAsset.name
+              });
+            }
+            
+            // Set file size from GitHub API (size field is in bytes)
+            if (apkAsset.size) {
+              const formattedSize = formatFileSize(apkAsset.size);
+              console.log('File size from GitHub API:', formattedSize);
+              setFileSize(formattedSize);
+            }
+          }
+        }
+      }
+    } catch (err) {
+      console.log('Could not fetch APK stats:', err.message);
+    }
+  };
+
+  const fetchFileSizeFromGitHub = async (downloadUrl) => {
+    try {
+      // Use GitHub's download URL with a Range request to get file size
+      const response = await fetch(downloadUrl, { 
+        method: 'GET',
+        headers: {
+          'Range': 'bytes=0-0'
+        }
+      });
+      
+      if (response.ok || response.status === 206) {
+        const contentRange = response.headers.get('content-range');
+        if (contentRange) {
+          // Content-Range format: "bytes 0-0/TOTAL_SIZE"
+          const match = contentRange.match(/\/(\d+)/);
+          if (match) {
+            const sizeInBytes = parseInt(match[1], 10);
+            const formattedSize = formatFileSize(sizeInBytes);
+            console.log('File size from GitHub:', formattedSize, `(${sizeInBytes} bytes)`);
+            setFileSize(formattedSize);
+            return;
+          }
+        }
+        
+        // Fallback to content-length if available
+        const contentLength = response.headers.get('content-length');
+        if (contentLength) {
+          const sizeInBytes = parseInt(contentLength, 10);
+          const formattedSize = formatFileSize(sizeInBytes);
+          console.log('File size from Content-Length:', formattedSize);
+          setFileSize(formattedSize);
+        }
+      }
+    } catch (err) {
+      console.log('Could not fetch file size from GitHub:', err.message);
+    }
+  };
 
   const fetchReleaseInfo = async () => {
     setLoading(true);
@@ -49,6 +137,9 @@ const Download = () => {
             notes: parseReleaseNotes(data.body),
             publishedAt: data.published_at,
           });
+
+          // Fetch APK stats from the specific release that has the APK (v1.3.1)
+          fetchAPKStats();
         } else {
           throw new Error('Invalid response format');
         }
@@ -78,6 +169,30 @@ const Download = () => {
     if (!version || typeof version !== 'string') return 'Latest Version';
     // Remove potentially harmful characters, keep alphanumeric, dots, and hyphens
     return version.replace(/[^a-zA-Z0-9.-]/g, '').substring(0, 20);
+  };
+
+  const formatFileSize = (bytes) => {
+    if (!bytes || typeof bytes !== 'number') return null;
+    
+    const mb = bytes / (1024 * 1024);
+    if (mb >= 1) {
+      return `${mb.toFixed(1)} MB`;
+    }
+    
+    const kb = bytes / 1024;
+    return `${kb.toFixed(1)} KB`;
+  };
+
+  const formatDownloadCount = (count) => {
+    if (!count || typeof count !== 'number') return '0';
+    
+    if (count >= 1000000) {
+      return `${(count / 1000000).toFixed(1)}M`;
+    }
+    if (count >= 1000) {
+      return `${(count / 1000).toFixed(1)}K`;
+    }
+    return count.toString();
   };
 
   const parseReleaseNotes = (body) => {
@@ -291,12 +406,32 @@ const Download = () => {
             </div>
           ) : (
             <>
-              {/* Version Info */}
+              {/* Version Info & Stats */}
               {releaseInfo && (
                 <div className="text-center mb-4 sm:mb-6">
-                  <span className="inline-block px-3 py-1 bg-primary/20 text-primary rounded-full text-xs sm:text-sm font-medium">
+                  <span className="inline-block px-3 py-1 bg-primary/20 text-primary rounded-full text-xs sm:text-sm font-medium mb-3">
                     {releaseInfo.version}
                   </span>
+                  
+                  {/* Download Stats & File Size */}
+                  {(downloadStats || fileSize) && (
+                    <div className="flex items-center justify-center gap-3 sm:gap-4 text-[10px] sm:text-xs text-secondary">
+                      {downloadStats && (
+                        <div className="flex items-center gap-1">
+                          <DownloadIcon size={12} className="sm:w-3.5 sm:h-3.5" />
+                          <span>{formatDownloadCount(downloadStats.totalDownloads)} downloads</span>
+                        </div>
+                      )}
+                      {fileSize && (
+                        <div className="flex items-center gap-1">
+                          <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                          </svg>
+                          <span>{fileSize}</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               )}
 
