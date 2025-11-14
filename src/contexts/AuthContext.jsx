@@ -23,6 +23,27 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Session timeout: 3 days in milliseconds
+  const SESSION_TIMEOUT = 3 * 24 * 60 * 60 * 1000; // 3 days
+
+  const checkSessionTimeout = () => {
+    const lastActivity = localStorage.getItem('lastActivity');
+    if (lastActivity) {
+      const timeSinceLastActivity = Date.now() - parseInt(lastActivity, 10);
+      if (timeSinceLastActivity > SESSION_TIMEOUT) {
+        // Session expired, log out
+        signOut(auth).catch(err => console.error('Auto logout error:', err));
+        localStorage.removeItem('lastActivity');
+        return true;
+      }
+    }
+    return false;
+  };
+
+  const updateLastActivity = () => {
+    localStorage.setItem('lastActivity', Date.now().toString());
+  };
+
   useEffect(() => {
     // If in demo mode, show configuration warning
     if (isDemoMode) {
@@ -39,6 +60,19 @@ export const AuthProvider = ({ children }) => {
 
       // Simply track auth state - let Firebase Rules handle authorization
       const unsubscribe = onAuthStateChanged(auth, (user) => {
+        if (user) {
+          // Check if session has expired
+          if (checkSessionTimeout()) {
+            setCurrentUser(null);
+            setLoading(false);
+            return;
+          }
+          // Update last activity on auth state change
+          updateLastActivity();
+        } else {
+          // Clean up on logout
+          localStorage.removeItem('lastActivity');
+        }
         setCurrentUser(user);
         setLoading(false);
       }, (err) => {
@@ -54,9 +88,42 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
+  // Track user activity to update session timeout
+  useEffect(() => {
+    if (!currentUser) return;
+
+    const activityEvents = ['mousedown', 'keydown', 'scroll', 'touchstart', 'click'];
+    
+    const handleActivity = () => {
+      updateLastActivity();
+    };
+
+    // Add event listeners for user activity
+    activityEvents.forEach(event => {
+      window.addEventListener(event, handleActivity);
+    });
+
+    // Check session timeout every minute
+    const intervalId = setInterval(() => {
+      if (checkSessionTimeout()) {
+        // Session expired, user will be logged out by onAuthStateChanged
+        setCurrentUser(null);
+      }
+    }, 60000); // Check every minute
+
+    return () => {
+      activityEvents.forEach(event => {
+        window.removeEventListener(event, handleActivity);
+      });
+      clearInterval(intervalId);
+    };
+  }, [currentUser]);
+
   const login = async (email, password) => {
     try {
       const result = await signInWithEmailAndPassword(auth, email, password);
+      // Set initial last activity timestamp on login
+      updateLastActivity();
       return result;
     } catch (error) {
       throw error;
@@ -66,6 +133,8 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       await signOut(auth);
+      // Clear last activity on logout
+      localStorage.removeItem('lastActivity');
     } catch (error) {
       throw error;
     }
