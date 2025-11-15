@@ -264,23 +264,20 @@ const Download = () => {
       const isExternalUrl = APK_URL.startsWith('http://') || APK_URL.startsWith('https://');
       
       if (isExternalUrl) {
-        // For external URLs, check if accessible then redirect
-        try {
-          const checkResponse = await fetch(APK_URL, { method: 'HEAD' });
-          if (!checkResponse.ok) {
-            setError('apk-not-found');
-            setDownloading(false);
-            return;
-          }
-        } catch (err) {
-          // If HEAD request fails, try direct download anyway
-          console.warn('HEAD check failed, attempting direct download');
-        }
+        // For external URLs (GitHub releases), open in new tab
+        // This prevents the stuck download issue on mobile
+        const link = document.createElement('a');
+        link.href = APK_URL;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        link.download = 'triji-app.apk';
         
-        // Direct browser download for external URLs
-        window.location.href = APK_URL;
+        // Trigger download
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
         
-        setTimeout(() => setDownloading(false), 2000);
+        setTimeout(() => setDownloading(false), 1000);
       } else {
         // For local files, check existence
         const checkResponse = await fetch(APK_URL, { method: 'HEAD' });
