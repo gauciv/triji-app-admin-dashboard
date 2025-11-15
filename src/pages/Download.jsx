@@ -9,6 +9,7 @@ const Download = () => {
   const [retryCount, setRetryCount] = useState(0);
   const [downloadStats, setDownloadStats] = useState(null);
   const [fileSize, setFileSize] = useState(null);
+  const [downloadStatus, setDownloadStatus] = useState(null); // 'started', 'success', 'failed'
 
   // Configuration
   const GITHUB_REPO = 'gauciv/triji-app'; // Update this to your actual repo
@@ -258,6 +259,7 @@ const Download = () => {
 
   const handleDownload = async () => {
     setDownloading(true);
+    setDownloadStatus('started');
     
     try {
       // Check if it's an external URL (S3, GitHub, etc.)
@@ -277,7 +279,16 @@ const Download = () => {
         link.click();
         document.body.removeChild(link);
         
-        setTimeout(() => setDownloading(false), 1000);
+        // Set success status after a short delay
+        setTimeout(() => {
+          setDownloading(false);
+          setDownloadStatus('success');
+        }, 1500);
+        
+        // Check if download actually started (reset status after 5 seconds)
+        setTimeout(() => {
+          setDownloadStatus(null);
+        }, 5000);
       } else {
         // For local files, check existence
         const checkResponse = await fetch(APK_URL, { method: 'HEAD' });
@@ -373,7 +384,7 @@ const Download = () => {
                   <button
                     onClick={handleDownload}
                     disabled={downloading}
-                    className="w-full flex items-center justify-center gap-2 sm:gap-3 px-4 sm:px-6 py-3 sm:py-4 bg-primary hover:bg-primary/90 text-dark-900 font-bold text-base sm:text-lg rounded-lg sm:rounded-xl transition-all duration-200 hover:scale-[1.02] shadow-lg shadow-primary/25 disabled:opacity-50 disabled:cursor-not-allowed mb-3"
+                    className="w-full flex items-center justify-center gap-2 sm:gap-3 px-4 sm:px-6 py-3 sm:py-4 bg-primary hover:bg-primary/90 text-dark-900 font-bold text-base sm:text-lg rounded-lg sm:rounded-xl transition-all duration-200 hover:scale-[1.02] shadow-lg shadow-primary/25 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer mb-3"
                   >
                     {downloading ? (
                       <>
@@ -436,13 +447,13 @@ const Download = () => {
               <button
                 onClick={handleDownload}
                 disabled={downloading}
-                className="w-full flex items-center justify-center gap-2 sm:gap-3 px-4 sm:px-6 py-3 sm:py-4 bg-primary hover:bg-primary/90 text-dark-900 font-bold text-base sm:text-lg rounded-lg sm:rounded-xl transition-all duration-200 hover:scale-[1.02] shadow-lg shadow-primary/25 disabled:opacity-50 disabled:cursor-not-allowed mb-4 sm:mb-6"
+                className="w-full flex items-center justify-center gap-2 sm:gap-3 px-4 sm:px-6 py-3 sm:py-4 bg-primary hover:bg-primary/90 text-dark-900 font-bold text-base sm:text-lg rounded-lg sm:rounded-xl transition-all duration-200 hover:scale-[1.02] shadow-lg shadow-primary/25 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer mb-2"
                 aria-label="Download Triji App for Android"
               >
                 {downloading ? (
                   <>
                     <div className="w-5 h-5 border-2 border-dark-900 border-t-transparent rounded-full animate-spin"></div>
-                    <span className="text-sm sm:text-base">Downloading...</span>
+                    <span className="text-sm sm:text-base">Starting download...</span>
                   </>
                 ) : (
                   <>
@@ -451,6 +462,26 @@ const Download = () => {
                   </>
                 )}
               </button>
+              
+              {/* Download Status Messages */}
+              <div className="min-h-[24px] mb-4">
+                {downloadStatus === 'success' && (
+                  <div className="flex items-center justify-center gap-2 text-green-500 text-xs sm:text-sm animate-in fade-in slide-in-from-bottom-2 duration-300">
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span>Download started! Check your browser's downloads.</span>
+                  </div>
+                )}
+                {downloadStatus === 'started' && !downloading && (
+                  <div className="flex items-center justify-center gap-2 text-yellow-500 text-xs sm:text-sm animate-in fade-in slide-in-from-bottom-2 duration-300">
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                    </svg>
+                    <span>If download didn't start, try clicking again or check your browser settings.</span>
+                  </div>
+                )}
+              </div>
 
               {/* Release Notes */}
               {releaseInfo?.notes && releaseInfo.notes.length > 0 && (
