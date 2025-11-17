@@ -304,6 +304,7 @@ const Download = () => {
         const link = document.createElement('a');
         link.href = APK_URL;
         link.download = 'triji-app.apk';
+        link.target = '_blank';
         link.rel = 'noopener noreferrer';
         
         // Trigger download
