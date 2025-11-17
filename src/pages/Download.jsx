@@ -267,61 +267,55 @@ const Download = () => {
     }
   };
 
-  const handleDownload = async () => {
+  const handleDownload = () => {
     setDownloading(true);
     setDownloadStatus('started');
     
-    try {
-      // Check if it's an external URL (S3, GitHub, etc.)
-      const isExternalUrl = APK_URL.startsWith('http://') || APK_URL.startsWith('https://');
+    // Check if it's an external URL (S3, GitHub, etc.)
+    const isExternalUrl = APK_URL.startsWith('http://') || APK_URL.startsWith('https://');
+    
+    if (isExternalUrl) {
+      // Create iframe download method - prevents navigation and stuck downloads
+      const iframe = document.createElement('iframe');
+      iframe.style.display = 'none';
+      iframe.src = APK_URL;
+      document.body.appendChild(iframe);
       
-      if (isExternalUrl) {
-        // For external URLs (GitHub releases), open in new tab
-        // This prevents navigation issues and download getting stuck
-        window.open(APK_URL, '_blank', 'noopener,noreferrer');
-        
-        // Set success status after a short delay
-        setTimeout(() => {
-          setDownloading(false);
-          setDownloadStatus('success');
-        }, 1500);
-        
-        // Check if download actually started (reset status after 5 seconds)
-        setTimeout(() => {
-          setDownloadStatus(null);
-        }, 5000);
-      } else {
-        // For local files, check existence
-        const checkResponse = await fetch(APK_URL, { method: 'HEAD' });
-        
-        if (!checkResponse.ok) {
-          setError('apk-not-found');
-          setDownloading(false);
-          return;
-        }
-
-        // Create a secure download link for local files
-        const link = document.createElement('a');
-        link.href = APK_URL;
-        link.download = 'triji-app.apk';
-        link.target = '_blank';
-        link.rel = 'noopener noreferrer';
-        
-        // Trigger download
-        document.body.appendChild(link);
-        link.click();
-        
-        // Clean up
-        setTimeout(() => {
-          document.body.removeChild(link);
-          setDownloading(false);
-        }, 100);
-      }
+      // Remove iframe after download starts
+      setTimeout(() => {
+        document.body.removeChild(iframe);
+      }, 3000);
       
-    } catch (err) {
-      console.error('Download error:', err);
-      setError('download-failed');
-      setDownloading(false);
+      // Set success status
+      setTimeout(() => {
+        setDownloading(false);
+        setDownloadStatus('success');
+      }, 1000);
+      
+      // Reset status
+      setTimeout(() => {
+        setDownloadStatus(null);
+      }, 5000);
+    } else {
+      // For local files, create download link
+      const link = document.createElement('a');
+      link.href = APK_URL;
+      link.download = 'triji-app.apk';
+      link.rel = 'noopener noreferrer';
+      
+      // Trigger download
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      setTimeout(() => {
+        setDownloading(false);
+        setDownloadStatus('success');
+      }, 1000);
+      
+      setTimeout(() => {
+        setDownloadStatus(null);
+      }, 5000);
     }
   };
 
