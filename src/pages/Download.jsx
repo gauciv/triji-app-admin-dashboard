@@ -13,7 +13,8 @@ const Download = () => {
 
   // Configuration
   const GITHUB_REPO = 'gauciv/triji-app'; // Update this to your actual repo
-  const APK_URL = import.meta.env.VITE_APK_URL || 'https://github.com/gauciv/triji-app/releases/tag/v1.5.1/triji-app.apk'; // Can be local path or full URL
+  const APK_URL = import.meta.env.VITE_APK_URL || 'https://github.com/gauciv/triji-app/releases/download/v1.6.0/triji-app.apk'; // Can be local path or full URL
+  const APK_VERSION = 'v1.6.0'; // Version tag that contains the APK
   const MAX_RETRIES = 3;
   const FETCH_TIMEOUT = 10000; // 10 seconds
 
@@ -24,9 +25,9 @@ const Download = () => {
 
   const fetchAPKStats = async () => {
     try {
-      // Fetch the specific release that contains the APK (v1.3.1)
+      // Fetch the specific release that contains the APK
       const response = await fetch(
-        `https://api.github.com/repos/${GITHUB_REPO}/releases/tags/v1.3.1`,
+        `https://api.github.com/repos/${GITHUB_REPO}/releases/tags/${APK_VERSION}`,
         {
           headers: {
             'Accept': 'application/vnd.github.v3+json',
