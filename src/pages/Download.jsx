@@ -25,9 +25,9 @@ const Download = () => {
 
   const fetchAPKStats = async () => {
     try {
-      // Fetch the specific release that contains the APK
-      const response = await fetch(
-        `https://api.github.com/repos/${GITHUB_REPO}/releases/tags/${APK_VERSION}`,
+      // Fetch all releases to calculate lifetime downloads
+      const releasesResponse = await fetch(
+        `https://api.github.com/repos/${GITHUB_REPO}/releases`,
         {
           headers: {
             'Accept': 'application/vnd.github.v3+json',
@@ -35,34 +35,43 @@ const Download = () => {
         }
       );
 
-      if (response.ok) {
-        const data = await response.json();
+      if (releasesResponse.ok) {
+        const releases = await releasesResponse.json();
         
-        if (data.assets && Array.isArray(data.assets)) {
-          // Find the APK file
-          const apkAsset = data.assets.find(asset => 
-            asset.name && asset.name.toLowerCase().endsWith('.apk')
-          );
-          
-          if (apkAsset) {
-            console.log('APK asset found:', apkAsset.name);
+        // Calculate total downloads across all releases
+        let totalDownloads = 0;
+        let latestApkAsset = null;
+        
+        // Loop through all releases to sum up APK downloads
+        for (const release of releases) {
+          if (release.assets && Array.isArray(release.assets)) {
+            const apkAssets = release.assets.filter(asset => 
+              asset.name && asset.name.toLowerCase().endsWith('.apk')
+            );
             
-            // Set download count from GitHub API
-            if (apkAsset.download_count !== undefined) {
-              console.log('Download count:', apkAsset.download_count);
-              setDownloadStats({
-                totalDownloads: apkAsset.download_count || 0,
-                fileName: apkAsset.name
-              });
-            }
-            
-            // Set file size from GitHub API (size field is in bytes)
-            if (apkAsset.size) {
-              const formattedSize = formatFileSize(apkAsset.size);
-              console.log('File size from GitHub API:', formattedSize);
-              setFileSize(formattedSize);
-            }
+            apkAssets.forEach(asset => {
+              totalDownloads += asset.download_count || 0;
+              // Keep track of the latest APK for file size
+              if (release.tag_name === APK_VERSION && !latestApkAsset) {
+                latestApkAsset = asset;
+              }
+            });
           }
+        }
+        
+        console.log('Total lifetime downloads:', totalDownloads);
+        
+        // Set lifetime download count
+        setDownloadStats({
+          totalDownloads: totalDownloads,
+          fileName: latestApkAsset?.name || 'triji-app.apk'
+        });
+        
+        // Set file size from the latest release
+        if (latestApkAsset && latestApkAsset.size) {
+          const formattedSize = formatFileSize(latestApkAsset.size);
+          console.log('File size from GitHub API:', formattedSize);
+          setFileSize(formattedSize);
         }
       }
     } catch (err) {
@@ -268,17 +277,8 @@ const Download = () => {
       
       if (isExternalUrl) {
         // For external URLs (GitHub releases), open in new tab
-        // This prevents the stuck download issue on mobile
-        const link = document.createElement('a');
-        link.href = APK_URL;
-        link.target = '_blank';
-        link.rel = 'noopener noreferrer';
-        link.download = 'triji-app.apk';
-        
-        // Trigger download
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        // This prevents navigation issues and download getting stuck
+        window.open(APK_URL, '_blank', 'noopener,noreferrer');
         
         // Set success status after a short delay
         setTimeout(() => {
