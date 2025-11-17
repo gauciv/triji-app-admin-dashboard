@@ -13,7 +13,7 @@ const Download = () => {
 
   // Configuration
   const GITHUB_REPO = 'gauciv/triji-app'; // Update this to your actual repo
-  const APK_URL = import.meta.env.VITE_APK_URL || 'https://github.com/gauciv/triji-app/releases/download/v1.3.1/triji-app-v1-3-1.apk'; // Can be local path or full URL
+  const APK_URL = import.meta.env.VITE_APK_URL || 'https://github.com/gauciv/triji-app/releases/tag/v1.5.1/triji-app.apk'; // Can be local path or full URL
   const MAX_RETRIES = 3;
   const FETCH_TIMEOUT = 10000; // 10 seconds
 
